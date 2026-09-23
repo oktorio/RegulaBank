@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#072e2a">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src https://ojk.go.id https://www.ojk.go.id; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <title>RegulaBank V1</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="v1.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand-mark" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="brand-copy">
+                <strong>RegulaBank</strong>
+                <span>Asisten ketentuan perbankan</span>
+            </div>
+            <span class="version-chip">V1</span>
+            <button class="icon-button" id="aboutButton" aria-label="Informasi aplikasi">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 10.8v5.4M12 7.7h.01"></path>
+                </svg>
+            </button>
+        </header>
+
+        <main>
+            <section id="libraryView">
+                <div class="hero">
+                    <div class="eyebrow"><span></span> BANKING REGULATORY WORKSPACE</div>
+                    <h1>Temukan ketentuan,<br><em>pahami keterkaitannya.</em></h1>
+                    <p>Cari nomor, judul, isi terindeks, istilah sepadan, atau teks PDF yang sudah diunduh.</p>
+
+                    <div class="search-card">
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="11" cy="11" r="6.5"></circle>
+                                <path d="m16 16 4 4"></path>
+                            </svg>
+                            <input id="searchInput" type="search" autocomplete="off"
+                                   placeholder="Contoh: izin usaha UUS" aria-label="Cari ketentuan">
+                            <button id="clearSearch" class="clear-search" aria-label="Hapus pencarian">×</button>
+                        </div>
+
+                        <div class="search-modes" role="tablist" aria-label="Bagian yang dicari">
+                            <button class="mode active" data-mode="all">Semua</button>
+                            <button class="mode" data-mode="number">Nomor</button>
+                            <button class="mode" data-mode="title">Judul</button>
+                            <button class="mode" data-mode="content">Isi</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-searches" id="quickSearches">
+                        <button data-query="izin usaha">izin usaha</button>
+                        <button data-query="modal disetor">modal disetor</button>
+                        <button data-query="fit and proper">fit &amp; proper</button>
+                        <button data-query="keamanan siber">keamanan siber</button>
+                    </div>
+                </div>
+
+                <div class="trust-strip">
+                    <div><strong id="indexedCount">11</strong><span>Ketentuan terindeks</span></div>
+                    <div><strong id="upcomingCount">1</strong><span>Akan berlaku</span></div>
+                    <div><strong id="attentionCount">3</strong><span>Perlu perhatian</span></div>
+                </div>
+
+                <section class="library">
+                    <div class="recent-searches" id="recentSearches" hidden>
+                        <span>Pencarian terakhir</span>
+                        <div id="recentSearchPills"></div>
+                    </div>
+
+                    <div class="section-heading">
+                        <div>
+                            <span class="kicker" id="resultKicker">PILIHAN TERBARU</span>
+                            <h2 id="resultTitle">Ketentuan perbankan</h2>
+                        </div>
+                        <button class="filter-button" id="filterButton">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 7h16M7 12h10M10 17h4"></path>
+                            </svg>
+                            Filter
+                            <span id="filterCount" hidden>0</span>
+                        </button>
+                    </div>
+
+                    <div class="filters" id="filters" hidden>
+                        <div class="filter-group">
+                            <span>Subsektor</span>
+                            <div class="filter-pills" id="categoryFilters"></div>
+                        </div>
+                        <div class="filter-group">
+                            <span>Status</span>
+                            <div class="filter-pills" id="statusFilters"></div>
+                        </div>
+                        <button class="reset-filter" id="resetFilter">Atur ulang filter</button>
+                    </div>
+
+                    <div class="result-meta">
+                        <span id="resultCount"></span>
+                        <span class="offline-search-state" id="offlineSearchState"></span>
+                        <label>
+                            Urutkan
+                            <select id="sortSelect">
+                                <option value="latest">Terbaru</option>
+                                <option value="relevance">Paling relevan</option>
+                                <option value="number">Nomor</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="regulation-list" id="regulationList"></div>
+
+                    <div class="empty-state" id="emptyState" hidden>
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="10.5" cy="10.5" r="6"></circle>
+                                <path d="m15 15 4.5 4.5M8 10.5h5"></path>
+                            </svg>
+                        </div>
+                        <h3>Belum ada hasil yang cocok</h3>
+                        <p>Coba kata lebih singkat, istilah sepadan, atau unduh PDF untuk menelusuri naskah lengkap secara offline.</p>
+                        <button id="emptyReset">Lihat semua ketentuan</button>
+                    </div>
+                </section>
+            </section>
+
+            <section class="workspace-view" id="alertsView" hidden>
+                <div class="page-intro">
+                    <span class="kicker">PEMANTAUAN</span>
+                    <h2>Pembaruan &amp; pengingat</h2>
+                    <p>Prioritas perubahan, tanggal efektif, dan status yang membutuhkan verifikasi.</p>
+                </div>
+
+                <div class="view-toolbar">
+                    <label class="switch-row">
+                        <span><strong>Hanya yang tersimpan</strong><small>Fokus pada koleksi pribadi Anda</small></span>
+                        <input id="savedAlertsOnly" type="checkbox">
+                    </label>
+                </div>
+                <div class="alert-list" id="alertList"></div>
+                <div class="empty-state compact" id="alertEmpty" hidden>
+                    <h3>Belum ada pengingat untuk koleksi ini</h3>
+                    <p>Simpan ketentuan dari halaman pencarian untuk memantaunya di sini.</p>
+                </div>
+                <p class="workspace-disclaimer">Pengingat V1 berasal dari indeks kurasi lokal, bukan notifikasi resmi OJK.</p>
+            </section>
+
+            <section class="workspace-view" id="checklistView" hidden>
+                <div class="page-intro">
+                    <span class="kicker">WORKSPACE PERIZINAN</span>
+                    <h2>Checklist perizinan</h2>
+                    <p>Kelola dokumen, PIC, target internal, dan bukti pemenuhan dalam satu tempat.</p>
+                </div>
+
+                <label class="template-picker">
+                    <span>Pilih template</span>
+                    <select id="checklistSelect"></select>
+                </label>
+
+                <div class="checklist-overview">
+                    <div class="progress-ring" id="checklistProgressRing"><strong id="checklistPercent">0%</strong></div>
+                    <div>
+                        <strong id="checklistTitle"></strong>
+                        <p id="checklistDescription"></p>
+                        <button class="text-action" id="openChecklistRegulation">Buka ketentuan utama</button>
+                    </div>
+                </div>
+
+                <div class="checklist-list" id="checklistList"></div>
+                <button class="secondary-button full-width" id="resetChecklist">Atur ulang template ini</button>
+                <p class="workspace-disclaimer">Checklist adalah template kerja internal. Persyaratan final wajib diverifikasi pada naskah dan korespondensi resmi OJK.</p>
+            </section>
+
+            <section class="saved-view" id="savedView" hidden>
+                <div class="page-intro">
+                    <span class="kicker">KOLEKSI PRIBADI</span>
+                    <h2>Ketentuan tersimpan</h2>
+                    <p>Bookmark dan catatan disimpan hanya di perangkat ini.</p>
+                </div>
+                <div class="saved-summary">
+                    <div><strong id="savedCount">0</strong><span>Ketentuan</span></div>
+                    <div><strong id="noteCount">0</strong><span>Catatan</span></div>
+                </div>
+                <div class="regulation-list" id="savedList"></div>
+                <div class="empty-state" id="savedEmpty">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M7 4.5h10v15l-5-3-5 3z"></path>
+                        </svg>
+                    </div>
+                    <h3>Belum ada ketentuan tersimpan</h3>
+                    <p>Ketuk ikon penanda pada ketentuan yang ingin dipantau.</p>
+                </div>
+            </section>
+
+            <section class="about-view" id="aboutView" hidden>
+                <div class="page-intro">
+                    <span class="kicker">REGULABANK · V1.0</span>
+                    <h2>Ruang kerja regulasi yang privat</h2>
+                    <p>Penelusuran, PDF offline, catatan, dan checklist tersimpan lokal tanpa akun.</p>
+                </div>
+
+                <div class="notice-card">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3 2.8 20h18.4z"></path>
+                        <path d="M12 9v4.5M12 17h.01"></path>
+                    </svg>
+                    <div>
+                        <strong>Bukan aplikasi resmi OJK</strong>
+                        <p>RegulaBank adalah alat bantu penelusuran dan bukan nasihat hukum. Selalu verifikasi naskah, status, perubahan, dan tenggat pada sumber resmi.</p>
+                    </div>
+                </div>
+
+                <h3 class="settings-title">Data offline</h3>
+                <div class="settings-card">
+                    <div class="storage-summary">
+                        <div class="storage-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5zM8 9h8M8 13h5"></path></svg>
+                        </div>
+                        <div><strong id="storageSize">Menghitung…</strong><span id="storageFiles">PDF dan indeks offline</span></div>
+                    </div>
+                    <button class="danger-outline" id="clearOfflineData">Hapus semua PDF offline</button>
+                </div>
+
+                <h3 class="settings-title">Standar V1</h3>
+                <div class="feature-grid">
+                    <article><strong>Pencarian cerdas</strong><p>Nomor, judul, isi, sinonim, dan teks PDF offline.</p></article>
+                    <article><strong>Jejak verifikasi</strong><p>Sumber, status indeks, dan tanggal terakhir diperiksa.</p></article>
+                    <article><strong>Relasi &amp; perubahan</strong><p>Aturan terkait dan ringkasan perubahan penting.</p></article>
+                    <article><strong>Privasi lokal</strong><p>Tanpa akun, analitik, atau penyimpanan catatan di server.</p></article>
+                </div>
+
+                <a class="official-hub" href="https://www.ojk.go.id/id/regulasi/">
+                    Buka pusat regulasi OJK
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
+                </a>
+                <p class="build-label">Indeks kurasi: 30 Juli 2026 · Build V1.0.0</p>
+            </section>
+        </main>
+
+        <nav class="bottom-nav v1-nav" aria-label="Navigasi utama">
+            <button class="nav-item active" data-view="library">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"></circle><path d="m15 15 4 4"></path></svg>
+                <span>Cari</span>
+            </button>
+            <button class="nav-item" data-view="alerts">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5zM10 20h4"></path></svg>
+                <span>Update</span>
+            </button>
+            <button class="nav-item" data-view="checklist">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h11M8 12h11M8 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg>
+                <span>Checklist</span>
+            </button>
+            <button class="nav-item" data-view="saved">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10v15l-5-3-5 3z"></path></svg>
+                <span>Simpan</span>
+            </button>
+            <button class="nav-item" data-view="about">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.8v5M12 7.7h.01"></path></svg>
+                <span>Info</span>
+            </button>
+        </nav>
+    </div>
+
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+    <aside class="detail-sheet" id="detailSheet" aria-modal="true" role="dialog" hidden>
+        <div class="sheet-handle"></div>
+        <div id="detailContent"></div>
+    </aside>
+
+    <div class="confirm-dialog" id="confirmDialog" hidden>
+        <div>
+            <h3 id="confirmTitle">Konfirmasi</h3>
+            <p id="confirmMessage"></p>
+            <div>
+                <button class="secondary-button" id="confirmCancel">Batal</button>
+                <button class="danger-button" id="confirmAction">Hapus</button>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <script src="data.js"></script>
+    <script src="v1-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
