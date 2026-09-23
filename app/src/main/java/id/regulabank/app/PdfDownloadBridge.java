@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
 public final class PdfDownloadBridge {
     private static final int MAX_PAGE_BYTES = 5 * 1024 * 1024;
     private static final int MAX_PDF_BYTES = 100 * 1024 * 1024;
+    private static final int MAX_REDIRECTS = 5;
+    private static final Pattern REGULATION_ID_PATTERN = Pattern.compile("[A-Za-z0-9][A-Za-z0-9_-]{0,79}");
     private static final Pattern PDF_LINK_PATTERN = Pattern.compile(
             "(?i)href\\s*=\\s*([\"'])([^\"']+?\\.pdf(?:\\?[^\"']*)?)\\1"
     );
@@ -62,7 +64,9 @@ public final class PdfDownloadBridge {
 
     @JavascriptInterface
     public int getDownloadedPdfCount(String regulationId) {
-        return listDownloadedPdfs(regulationId).size();
+        String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) return 0;
+        return listDownloadedPdfs(safeId).size();
     }
 
     @JavascriptInterface
@@ -134,10 +138,15 @@ public final class PdfDownloadBridge {
     @JavascriptInterface
     public void showDownloadedPdfs(String regulationId, String title) {
         final String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) {
+            toast("Identitas ketentuan tidak valid.");
+            return;
+        }
         activity.runOnUiThread(() -> showPdfPicker(safeId, title));
     }
 
     private List<String> discoverPdfUrls(String sourceUrl) throws Exception {
+        if (!isOfficialOjkUrl(sourceUrl)) throw new IOException("Domain sumber tidak diizinkan.");
         if (sourceUrl.toLowerCase(Locale.ROOT).contains(".pdf")) {
             return Collections.singletonList(sourceUrl);
         }
@@ -171,10 +180,13 @@ public final class PdfDownloadBridge {
     }
 
     private String fetchText(String sourceUrl) throws IOException {
-        HttpURLConnection connection = openConnection(sourceUrl);
+        HttpURLConnection connection = openOfficialConnection(sourceUrl);
         try {
             int response = connection.getResponseCode();
-            if (response < 200 || response >= 400) throw new IOException("HTTP " + response);
+            if (response < 200 || response >= 300) throw new IOException("HTTP " + response);
+
+            long contentLength = connection.getContentLengthLong();
+            if (contentLength > MAX_PAGE_BYTES) throw new IOException("Halaman terlalu besar.");
 
             try (InputStream input = new BufferedInputStream(connection.getInputStream());
                  ByteArrayOutputStream output = new ByteArrayOutputStream()) {
@@ -194,16 +206,21 @@ public final class PdfDownloadBridge {
     }
 
     private void downloadPdf(String pdfUrl, File directory, Set<String> usedNames) throws IOException {
+        if (!isOfficialOjkUrl(pdfUrl)) throw new IOException("Domain PDF tidak diizinkan.");
+
         String fileName = uniqueFileName(fileNameFromUrl(pdfUrl), usedNames);
         File destination = new File(directory, fileName);
         if (destination.exists() && isValidPdf(destination)) return;
 
         File partial = new File(directory, fileName + ".part");
         if (partial.exists()) partial.delete();
-        HttpURLConnection connection = openConnection(pdfUrl);
+        HttpURLConnection connection = openOfficialConnection(pdfUrl);
         try {
             int response = connection.getResponseCode();
-            if (response < 200 || response >= 400) throw new IOException("HTTP " + response);
+            if (response < 200 || response >= 300) throw new IOException("HTTP " + response);
+
+            long contentLength = connection.getContentLengthLong();
+            if (contentLength > MAX_PDF_BYTES) throw new IOException("PDF terlalu besar.");
 
             try (InputStream input = new BufferedInputStream(connection.getInputStream());
                  BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(partial))) {
@@ -226,14 +243,39 @@ public final class PdfDownloadBridge {
         }
     }
 
-    private HttpURLConnection openConnection(String url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setInstanceFollowRedirects(true);
-        connection.setConnectTimeout(20000);
-        connection.setReadTimeout(45000);
-        connection.setRequestProperty("User-Agent", "RegulaBank/0.2 (Android; official OJK PDF reader)");
-        connection.setRequestProperty("Accept", "application/pdf,text/html;q=0.9,*/*;q=0.8");
-        return connection;
+    /**
+     * Opens only HTTPS connections to ojk.go.id and validates every redirect hop.
+     * This prevents a trusted OJK URL from redirecting the native downloader to an
+     * unrelated host or to cleartext HTTP.
+     */
+    private HttpURLConnection openOfficialConnection(String initialUrl) throws IOException {
+        String currentUrl = initialUrl;
+        for (int redirect = 0; redirect <= MAX_REDIRECTS; redirect++) {
+            if (!isOfficialOjkUrl(currentUrl)) throw new IOException("Domain tidak diizinkan.");
+
+            HttpURLConnection connection = (HttpURLConnection) new URL(currentUrl).openConnection();
+            connection.setInstanceFollowRedirects(false);
+            connection.setConnectTimeout(20000);
+            connection.setReadTimeout(45000);
+            connection.setRequestProperty("User-Agent", "RegulaBank/1.1 (Android; official OJK PDF reader)");
+            connection.setRequestProperty("Accept", "application/pdf,text/html;q=0.9,*/*;q=0.8");
+
+            int response = connection.getResponseCode();
+            if (response < 300 || response >= 400) return connection;
+
+            String location = connection.getHeaderField("Location");
+            connection.disconnect();
+            if (location == null || location.trim().isEmpty()) {
+                throw new IOException("Redirect tanpa lokasi tujuan.");
+            }
+
+            try {
+                currentUrl = new URI(currentUrl).resolve(location.trim()).toString();
+            } catch (Exception error) {
+                throw new IOException("Redirect tidak valid.", error);
+            }
+        }
+        throw new IOException("Terlalu banyak redirect.");
     }
 
     private boolean isOfficialOjkUrl(String value) {
@@ -241,10 +283,12 @@ public final class PdfDownloadBridge {
             URI uri = new URI(value);
             String host = uri.getHost();
             String scheme = uri.getScheme();
-            return host != null
-                    && ("https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme))
-                    && (host.equalsIgnoreCase("ojk.go.id")
-                    || host.toLowerCase(Locale.ROOT).endsWith(".ojk.go.id"));
+            int port = uri.getPort();
+            if (host == null || !"https".equalsIgnoreCase(scheme)) return false;
+            if (uri.getUserInfo() != null) return false;
+            if (port != -1 && port != 443) return false;
+            String normalizedHost = host.toLowerCase(Locale.ROOT);
+            return normalizedHost.equals("ojk.go.id") || normalizedHost.endsWith(".ojk.go.id");
         } catch (Exception ignored) {
             return false;
         }
@@ -279,15 +323,21 @@ public final class PdfDownloadBridge {
     }
 
     private String sanitizeId(String value) {
-        return value == null ? "" : value.replaceAll("[^A-Za-z0-9._-]", "");
+        if (value == null) return "";
+        String candidate = value.trim();
+        return REGULATION_ID_PATTERN.matcher(candidate).matches() ? candidate : "";
     }
 
     private File pdfDirectory(String regulationId) {
-        return new File(new File(activity.getFilesDir(), "pdfs"), sanitizeId(regulationId));
+        String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) return new File(new File(activity.getFilesDir(), "pdfs"), "__invalid__");
+        return new File(new File(activity.getFilesDir(), "pdfs"), safeId);
     }
 
     private List<File> listDownloadedPdfs(String regulationId) {
-        File[] files = pdfDirectory(regulationId).listFiles(
+        String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) return new ArrayList<>();
+        File[] files = pdfDirectory(safeId).listFiles(
                 file -> file.isFile() && file.getName().toLowerCase(Locale.ROOT).endsWith(".pdf") && isValidPdf(file)
         );
         List<File> result = new ArrayList<>();
