@@ -33,11 +33,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public final class AppBridge {
     private static final String INDEX_FILE = ".search-index.txt";
     private static final int MAX_INDEX_CHARS = 6_000_000;
     private static final int MAX_QUERY_LENGTH = 160;
+    private static final Pattern REGULATION_ID_PATTERN = Pattern.compile("[A-Za-z0-9][A-Za-z0-9_-]{0,79}");
 
     private final Activity activity;
     private final File pdfRoot;
@@ -74,13 +76,18 @@ public final class AppBridge {
 
     @JavascriptInterface
     public boolean hasOfflineIndex(String regulationId) {
-        File index = new File(regulationDirectory(regulationId), INDEX_FILE);
+        String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) return false;
+        File index = new File(regulationDirectory(safeId), INDEX_FILE);
         return index.isFile() && index.length() > 0;
     }
 
     @JavascriptInterface
     public int prepareOfflineIndex(String regulationId) {
-        File directory = regulationDirectory(regulationId);
+        String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) return 0;
+
+        File directory = regulationDirectory(safeId);
         List<File> pdfs = listPdfs(directory);
         if (pdfs.isEmpty()) return 0;
 
@@ -149,11 +156,14 @@ public final class AppBridge {
         File[] directories = pdfRoot.listFiles(File::isDirectory);
         if (directories != null && !query.isEmpty()) {
             for (File directory : directories) {
+                String safeId = sanitizeId(directory.getName());
+                if (safeId.isEmpty()) continue;
+
                 List<File> pdfs = listPdfs(directory);
                 if (pdfs.isEmpty()) continue;
                 File index = new File(directory, INDEX_FILE);
                 if (!index.isFile() || index.lastModified() < newestModified(pdfs)) {
-                    prepareOfflineIndex(directory.getName());
+                    prepareOfflineIndex(safeId);
                 }
                 if (!index.isFile()) continue;
 
@@ -180,7 +190,7 @@ public final class AppBridge {
 
                 JSONObject match = new JSONObject();
                 try {
-                    match.put("id", directory.getName());
+                    match.put("id", safeId);
                     match.put("snippet", snippet(normalizedText, firstHit));
                     matches.put(match);
                 } catch (JSONException ignored) {
@@ -220,11 +230,15 @@ public final class AppBridge {
     }
 
     private File regulationDirectory(String regulationId) {
-        return new File(pdfRoot, sanitizeId(regulationId));
+        String safeId = sanitizeId(regulationId);
+        if (safeId.isEmpty()) return new File(pdfRoot, "__invalid__");
+        return new File(pdfRoot, safeId);
     }
 
     private String sanitizeId(String value) {
-        return value == null ? "" : value.replaceAll("[^A-Za-z0-9._-]", "");
+        if (value == null) return "";
+        String candidate = value.trim();
+        return REGULATION_ID_PATTERN.matcher(candidate).matches() ? candidate : "";
     }
 
     private String safeLabel(String value) {
