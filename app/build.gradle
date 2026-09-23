@@ -1,0 +1,48 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "id.regulabank.app"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "id.regulabank.app"
+        minSdk 24
+        targetSdk 35
+        versionCode 10
+        versionName "1.0.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                    "META-INF/DEPENDENCIES",
+                    "META-INF/LICENSE",
+                    "META-INF/LICENSE.txt",
+                    "META-INF/NOTICE",
+                    "META-INF/NOTICE.txt"
+            ]
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ""
+            versionNameSuffix ""
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+}
+
+dependencies {
+    implementation "com.tom-roush:pdfbox-android:2.0.27.0"
+}
