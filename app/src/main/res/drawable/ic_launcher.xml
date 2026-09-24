@@ -3,13 +3,19 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#0D5C50"
-        android:pathData="M0,0h108v108h-108z" />
-    <path
-        android:fillColor="#F5D7A4"
-        android:pathData="M27,31h54v8h-54zM31,43h8v29h-8zM50,43h8v29h-8zM69,43h8v29h-8zM24,76h60v7h-60z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,18L84,31H24z" />
+    <!-- RegulaBank V1.3.1: red-white batik/book mark based on approved app logo -->
+    <path android:fillColor="#B40816" android:pathData="M0,0h108v108h-108z"/>
+    <path android:fillColor="#8E0712" android:pathData="M0,0h44c-9,9 -17,19 -24,31c-8,14 -13,27 -20,34zM108,61v47H58c13,-7 25,-16 34,-27c7,-8 11,-14 16,-20z"/>
+    <!-- subtle batik-inspired corner ornaments -->
+    <path android:fillColor="#D96A4D" android:fillAlpha="0.65" android:pathData="M5,7c9,0 15,5 18,12c-7,-4 -13,-4 -18,0zM12,25c7,-7 15,-8 22,-4c-8,1 -13,5 -16,12zM87,82c7,-5 13,-5 18,-1v12c-6,-5 -12,-6 -18,-3zM75,99c7,-8 15,-11 24,-9c-7,4 -11,9 -13,18H75z"/>
+    <path android:fillColor="#F1A26D" android:fillAlpha="0.75" android:pathData="M9,10c4,2 6,5 7,9c-4,-2 -7,-1 -10,1c1,-4 2,-7 3,-10zM96,88c3,3 4,6 3,10c-3,-2 -6,-2 -9,0c1,-4 3,-7 6,-10z"/>
+    <!-- open book -->
+    <path android:fillColor="#FFFFFF" android:pathData="M53,34C44,26 34,23 21,22v39c12,1 23,6 32,15z"/>
+    <path android:fillColor="#FFF9F4" android:pathData="M55,34c9,-8 19,-11 32,-12v39c-12,1 -23,6 -32,15z"/>
+    <path android:fillColor="#F7EDE8" android:pathData="M53,69C42,60 32,57 18,58v7c14,0 25,5 35,14zM55,69c11,-9 21,-12 35,-11v7c-14,0 -25,5 -35,14z"/>
+    <!-- batik motif on left page -->
+    <path android:fillColor="#D33A31" android:pathData="M22,27c12,2 22,6 31,13v25c-8,-7 -18,-11 -31,-12z"/>
+    <path android:fillColor="#F8D39D" android:pathData="M26,32c7,3 12,8 15,15c-5,-3 -9,-3 -13,0c4,2 7,5 9,9c-6,-3 -10,-3 -14,-1v-7c3,-1 6,-1 9,0c-4,-5 -6,-10 -6,-16zM43,39c4,3 7,7 9,12v7c-3,-5 -6,-8 -10,-10c2,-3 2,-6 1,-9z"/>
+    <!-- central fold/shadow -->
+    <path android:fillColor="#7A0710" android:fillAlpha="0.75" android:pathData="M53,34l2,0v43l-2,2z"/>
 </vector>
