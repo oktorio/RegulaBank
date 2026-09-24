@@ -308,8 +308,14 @@
     if (state.query) {
       elements.kicker.textContent = "HASIL PENCARIAN";
       elements.title.textContent = `“${state.query}”`;
+    } else if (state.attentionOnly) {
+      elements.kicker.textContent = "PERLU PERHATIAN";
+      elements.title.textContent = "Ketentuan yang perlu ditinjau";
+    } else if (state.statuses.size) {
+      elements.kicker.textContent = "AKAN BERLAKU";
+      elements.title.textContent = "Ketentuan yang akan berlaku";
     } else {
-      elements.kicker.textContent = "PILIHAN TERBARU";
+      elements.kicker.textContent = "SEMUA KETENTUAN";
       elements.title.textContent = "Ketentuan perbankan";
     }
     bindCardEvents(elements.list);
@@ -750,7 +756,7 @@
     state.attentionOnly = false;
     setView("library");
     elements.input.value = query;
-    elements.input.dispatchEvent(new Event("input"));
+    elements.input.dispatchEvent(new Event("input", { bubbles: true }));
     if (save) saveRecentSearch(query);
   }
 
@@ -993,11 +999,18 @@
 
   function applyDashboardShortcut(kind) {
     state.query = "";
+    elements.input.value = "";
+    previousQuery = "";
+    elements.input.parentElement.classList.remove("has-value");
+    state.offlineMatches.clear();
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
     state.attentionOnly = kind === "attention";
-    if (kind === "upcoming") state.statuses.add("Akan berlaku");
+    if (kind === "upcoming") {
+      REGULATIONS.filter((item) => normalize(item.status).includes("akan berlaku"))
+        .forEach((item) => state.statuses.add(item.status));
+    }
     state.sort = kind === "attention" ? "integrity" : "latest";
     elements.sort.value = state.sort;
     setView("library");
