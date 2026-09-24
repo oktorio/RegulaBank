@@ -172,6 +172,7 @@ if (baselines.schemaVersion !== 1 || baselines.authority !== policy.authority ||
     }
     const regulation = regulations.find((item) => item.id === id);
     if (!sha256Pattern.test(String(baseline.fingerprint || ""))) error(`baseline:${id}`, "Baseline fingerprint must be lowercase SHA-256.");
+    if (baseline.fingerprintMethod !== "visible-text-sha256-v1") error(`baseline:${id}`, "Unsupported baseline fingerprintMethod.");
     if (!baseline.approvedBy || typeof baseline.approvedBy !== "string") error(`baseline:${id}`, "approvedBy is required.");
     for (const field of ["approvedAt", "evidenceGeneratedAt"]) {
       if (!baseline[field] || Number.isNaN(Date.parse(baseline[field]))) error(`baseline:${id}`, `${field} must be an ISO timestamp.`);
