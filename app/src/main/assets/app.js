@@ -9,6 +9,7 @@
     mode: "all",
     categories: new Set(),
     statuses: new Set(),
+    integrityStates: new Set(),
     sort: "latest",
     view: "library",
     favorites: new Set(readStore("regulabank-favorites", [])),
@@ -35,6 +36,7 @@
     filterCount: $("#filterCount"),
     categoryFilters: $("#categoryFilters"),
     statusFilters: $("#statusFilters"),
+    integrityFilters: $("#integrityFilters"),
     resetFilter: $("#resetFilter"),
     sort: $("#sortSelect"),
     empty: $("#emptyState"),
@@ -209,6 +211,30 @@
     return normalize(status).replace(/\s+/g, "-");
   }
 
+  const INTEGRITY_LABELS = Object.freeze({
+    current: "Terkini",
+    review: "Tinjau ulang",
+    stale: "Kedaluwarsa",
+    unknown: "Belum pasti"
+  });
+
+  function integrityState(regulation) {
+    return regulation.integrity?.state || "unknown";
+  }
+
+  function integrityLabel(regulation) {
+    return INTEGRITY_LABELS[integrityState(regulation)] || INTEGRITY_LABELS.unknown;
+  }
+
+  function integrityPriority(regulation) {
+    return { stale: 4, review: 3, unknown: 2, current: 1 }[integrityState(regulation)] || 0;
+  }
+
+  function integrityAgeLabel(regulation) {
+    const age = regulation.integrity?.ageDays;
+    return Number.isFinite(age) ? `${age} hari sejak verifikasi` : "usia verifikasi tidak tersedia";
+  }
+
   function cardTemplate(regulation) {
     const favorite = state.favorites.has(regulation.id);
     const hasNote = Boolean((state.notes[regulation.id] || "").trim());
@@ -228,6 +254,7 @@
           <div class="card-footer">
             <span class="category-tag">${escapeHtml(regulation.category)}</span>
             <span class="status-tag ${statusClass(regulation.status)}">${escapeHtml(regulation.status)}</span>
+            <span class="integrity-tag integrity-${escapeHtml(integrityState(regulation))}">${escapeHtml(integrityLabel(regulation))}</span>
           </div>
           <div class="verification-row">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
@@ -244,6 +271,7 @@
         if (score <= 0) return false;
         if (state.categories.size && !state.categories.has(regulation.category)) return false;
         if (state.statuses.size && !state.statuses.has(regulation.status)) return false;
+        if (state.integrityStates.size && !state.integrityStates.has(integrityState(regulation))) return false;
         return true;
       });
 
@@ -253,6 +281,10 @@
       }
       if (state.sort === "number") {
         return a.regulation.number.localeCompare(b.regulation.number, "id", { numeric: true });
+      }
+      if (state.sort === "integrity") {
+        return integrityPriority(b.regulation) - integrityPriority(a.regulation)
+          || dateScore(b.regulation) - dateScore(a.regulation);
       }
       return dateScore(b.regulation) - dateScore(a.regulation);
     });
@@ -316,11 +348,16 @@
   function renderFilters() {
     const categories = [...new Set(REGULATIONS.map((item) => item.category))].sort();
     const statuses = [...new Set(REGULATIONS.map((item) => item.status))].sort();
+    const integrityStates = ["stale", "review", "unknown", "current"]
+      .filter((value) => REGULATIONS.some((item) => integrityState(item) === value));
     elements.categoryFilters.innerHTML = categories.map((category) =>
       `<button class="filter-pill ${state.categories.has(category) ? "active" : ""}" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`
     ).join("");
     elements.statusFilters.innerHTML = statuses.map((status) =>
       `<button class="filter-pill ${state.statuses.has(status) ? "active" : ""}" data-status="${escapeHtml(status)}">${escapeHtml(status)}</button>`
+    ).join("");
+    elements.integrityFilters.innerHTML = integrityStates.map((value) =>
+      `<button class="filter-pill integrity-filter ${state.integrityStates.has(value) ? "active" : ""}" data-integrity="${escapeHtml(value)}">${escapeHtml(INTEGRITY_LABELS[value])}</button>`
     ).join("");
 
     elements.categoryFilters.querySelectorAll("[data-category]").forEach((button) => {
@@ -337,8 +374,15 @@
         renderLibrary();
       });
     });
+    elements.integrityFilters.querySelectorAll("[data-integrity]").forEach((button) => {
+      button.addEventListener("click", () => {
+        toggleSet(state.integrityStates, button.dataset.integrity);
+        renderFilters();
+        renderLibrary();
+      });
+    });
 
-    const count = state.categories.size + state.statuses.size;
+    const count = state.categories.size + state.statuses.size + state.integrityStates.size;
     elements.filterCount.textContent = String(count);
     elements.filterCount.hidden = count === 0;
   }
@@ -407,9 +451,12 @@
         <div><span>Efektif</span><strong>${escapeHtml(regulation.effective)}</strong></div>
       </div>
       <div class="verification-card">
-        <div><span>Verifikasi</span><strong>${escapeHtml(regulation.verification)}</strong></div>
+        <div><span>Verifikasi manusia</span><strong>${escapeHtml(regulation.verification)}</strong></div>
         <div><span>Terakhir diperiksa</span><strong>${escapeHtml(regulation.verifiedAt)}</strong></div>
+        <div><span>Freshness</span><strong class="integrity-text integrity-${escapeHtml(integrityState(regulation))}">${escapeHtml(integrityLabel(regulation))}</strong></div>
+        <div><span>Usia verifikasi</span><strong>${escapeHtml(integrityAgeLabel(regulation))}</strong></div>
       </div>
+      <p class="integrity-note">Freshness dihitung dari usia verifikasi kurasi. Status ini bukan penetapan status hukum ketentuan dan tidak menggantikan verifikasi pada sumber resmi OJK.</p>
       <section class="detail-section">
         <h3>Ikhtisar</h3>
         <p>${escapeHtml(regulation.summary)}</p>
@@ -791,6 +838,7 @@
   elements.resetFilter.addEventListener("click", () => {
     state.categories.clear();
     state.statuses.clear();
+    state.integrityStates.clear();
     renderFilters();
     renderLibrary();
   });
