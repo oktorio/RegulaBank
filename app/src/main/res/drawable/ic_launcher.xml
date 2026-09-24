@@ -3,19 +3,28 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- RegulaBank V1.3.1: red-white batik/book mark based on approved app logo -->
-    <path android:fillColor="#B40816" android:pathData="M0,0h108v108h-108z"/>
-    <path android:fillColor="#8E0712" android:pathData="M0,0h44c-9,9 -17,19 -24,31c-8,14 -13,27 -20,34zM108,61v47H58c13,-7 25,-16 34,-27c7,-8 11,-14 16,-20z"/>
-    <!-- subtle batik-inspired corner ornaments -->
-    <path android:fillColor="#D96A4D" android:fillAlpha="0.65" android:pathData="M5,7c9,0 15,5 18,12c-7,-4 -13,-4 -18,0zM12,25c7,-7 15,-8 22,-4c-8,1 -13,5 -16,12zM87,82c7,-5 13,-5 18,-1v12c-6,-5 -12,-6 -18,-3zM75,99c7,-8 15,-11 24,-9c-7,4 -11,9 -13,18H75z"/>
-    <path android:fillColor="#F1A26D" android:fillAlpha="0.75" android:pathData="M9,10c4,2 6,5 7,9c-4,-2 -7,-1 -10,1c1,-4 2,-7 3,-10zM96,88c3,3 4,6 3,10c-3,-2 -6,-2 -9,0c1,-4 3,-7 6,-10z"/>
-    <!-- open book -->
-    <path android:fillColor="#FFFFFF" android:pathData="M53,34C44,26 34,23 21,22v39c12,1 23,6 32,15z"/>
-    <path android:fillColor="#FFF9F4" android:pathData="M55,34c9,-8 19,-11 32,-12v39c-12,1 -23,6 -32,15z"/>
-    <path android:fillColor="#F7EDE8" android:pathData="M53,69C42,60 32,57 18,58v7c14,0 25,5 35,14zM55,69c11,-9 21,-12 35,-11v7c-14,0 -25,5 -35,14z"/>
-    <!-- batik motif on left page -->
-    <path android:fillColor="#D33A31" android:pathData="M22,27c12,2 22,6 31,13v25c-8,-7 -18,-11 -31,-12z"/>
-    <path android:fillColor="#F8D39D" android:pathData="M26,32c7,3 12,8 15,15c-5,-3 -9,-3 -13,0c4,2 7,5 9,9c-6,-3 -10,-3 -14,-1v-7c3,-1 6,-1 9,0c-4,-5 -6,-10 -6,-16zM43,39c4,3 7,7 9,12v7c-3,-5 -6,-8 -10,-10c2,-3 2,-6 1,-9z"/>
-    <!-- central fold/shadow -->
-    <path android:fillColor="#7A0710" android:fillAlpha="0.75" android:pathData="M53,34l2,0v43l-2,2z"/>
+    <!-- RegulaBank V1.3.1: red-white book with Indonesian batik accents -->
+    <path android:fillColor="#B40012" android:pathData="M16,4 C9,4 4,9 4,16 L4,92 C4,99 9,104 16,104 L92,104 C99,104 104,99 104,92 L104,16 C104,9 99,4 92,4 Z"/>
+    <path android:fillColor="#D7192D" android:pathData="M4,16 C4,9 9,4 16,4 L92,4 C99,4 104,9 104,16 L104,46 C85,57 66,52 51,37 C36,22 19,18 4,25 Z"/>
+    <path android:fillColor="#7D0010" android:pathData="M4,78 C23,65 38,72 53,84 C68,96 84,98 104,87 L104,92 C104,99 99,104 92,104 L16,104 C9,104 4,99 4,92 Z"/>
+    <!-- batik corner ornaments -->
+    <path android:fillColor="#E38A63" android:fillAlpha="0.62" android:pathData="M4,24 C13,19 20,12 25,4 L34,4 C29,15 20,25 8,31 Z M4,12 C8,10 12,7 15,4 L22,4 C17,11 11,16 4,19 Z"/>
+    <path android:fillColor="#E38A63" android:fillAlpha="0.55" android:pathData="M104,72 C95,77 88,84 83,104 L73,104 C78,91 88,81 100,75 Z M104,84 C98,89 94,96 91,104 L84,104 C88,94 95,86 104,80 Z"/>
+    <path android:fillColor="#F2B08A" android:fillAlpha="0.7" android:pathData="M13,10 C15,7 18,7 20,10 C18,13 15,13 13,10 Z M22,15 C24,12 27,12 29,15 C27,18 24,18 22,15 Z M10,20 C12,17 15,17 17,20 C15,23 12,23 10,20 Z M91,89 C93,86 96,86 98,89 C96,92 93,92 91,89 Z M82,95 C84,92 87,92 89,95 C87,98 84,98 82,95 Z"/>
+    <!-- open book shadow -->
+    <path android:fillColor="#65000A" android:fillAlpha="0.48" android:pathData="M18,35 C33,35 44,40 53,50 L55,88 C43,76 32,70 18,69 Z M90,35 C75,35 64,40 55,50 L53,88 C65,76 76,70 90,69 Z"/>
+    <!-- left red batik page -->
+    <path android:fillColor="#E51D2E" android:pathData="M19,31 C34,32 45,38 53,49 L53,84 C43,74 33,69 19,67 Z"/>
+    <path android:fillColor="#F6C78F" android:fillAlpha="0.95" android:pathData="M23,38 C30,39 37,42 43,47 C38,47 34,50 31,54 C28,49 25,45 21,43 Z M26,56 C29,52 33,52 36,56 C33,60 29,60 26,56 Z M39,62 C42,58 46,58 49,62 C46,66 42,66 39,62 Z"/>
+    <path android:fillColor="#F8D7AA" android:fillAlpha="0.9" android:pathData="M20,33 C34,34 44,39 51,49 L51,53 C43,44 33,39 20,38 Z"/>
+    <!-- right white page -->
+    <path android:fillColor="#FFFDF9" android:pathData="M55,49 C63,38 74,32 89,31 L89,67 C75,69 65,74 55,84 Z"/>
+    <path android:fillColor="#F1E4DF" android:pathData="M55,71 C66,65 77,60 89,52 L89,67 C75,69 65,74 55,84 Z"/>
+    <!-- lower book pages -->
+    <path android:fillColor="#FFFFFF" android:pathData="M16,61 C25,70 38,72 52,84 L52,91 C39,80 28,77 18,74 C16,72 15,67 16,61 Z"/>
+    <path android:fillColor="#F5EEE9" android:pathData="M20,76 C31,78 41,82 52,92 L52,96 C41,88 31,85 23,83 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M56,84 C69,72 81,70 92,61 C93,67 92,72 90,74 C79,77 68,80 56,91 Z"/>
+    <path android:fillColor="#F5EEE9" android:pathData="M56,92 C67,82 77,78 88,76 L85,83 C77,85 67,88 56,96 Z"/>
+    <!-- center fold -->
+    <path android:fillColor="#8B0010" android:pathData="M52,48 L54,50 L56,48 L56,92 L54,96 L52,92 Z"/>
 </vector>
