@@ -34,8 +34,11 @@ jobs:
           base64 --decode app/src/main/res/drawable/regulabank_logo.jpg.b64 > app/src/main/res/drawable/regulabank_logo.jpg
           rm app/src/main/res/drawable/regulabank_logo.jpg.b64
 
-      - name: Build and lint
-        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:lintDebug
+      - name: Build APK
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Lint
+        run: gradle --no-daemon --stacktrace :app:lintDebug
 
       - name: Prepare installable APK
         run: cp app/build/outputs/apk/debug/app-debug.apk RegulaBank-v1.3.2-debug.apk
