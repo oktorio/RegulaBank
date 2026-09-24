@@ -11,6 +11,11 @@ export async function loadPolicy() {
   return JSON.parse(raw);
 }
 
+export async function loadBaselines() {
+  const raw = await fs.readFile(path.join(ROOT, "config", "regulatory-baselines.json"), "utf8");
+  return JSON.parse(raw);
+}
+
 export async function loadRegulatoryData() {
   const dataPath = path.join(ROOT, "app", "src", "main", "assets", "data.js");
   const metadataPath = path.join(ROOT, "app", "src", "main", "assets", "v1-data.js");

@@ -1,5 +1,6 @@
 const V1_REGULATION_METADATA = {
   "pojk-4-2026": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["investasi syariah", "produk investasi bank syariah", "izin produk syariah"],
@@ -8,6 +9,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-2-2024", "pojk-12-2023", "pojk-16-2022"]
   },
   "padk-1-2026": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["IT bank", "TI bank", "data center luar negeri", "sistem elektronik bank"],
@@ -16,6 +18,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-12-2021", "pojk-34-2025"]
   },
   "pojk-34-2025": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["IT BPR", "TI BPRS", "cyber security BPR", "disaster recovery BPR"],
@@ -24,6 +27,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-7-2024", "padk-1-2026"]
   },
   "pojk-7-2025": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["laporan kustodian", "bank kustodian", "laporan insidental"],
@@ -32,6 +36,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-12-2021"]
   },
   "pojk-26-2024": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["ekspansi usaha bank", "penyertaan modal bank", "cessie bank", "wakaf bank"],
@@ -40,6 +45,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-12-2021", "pojk-7-2024"]
   },
   "pojk-7-2024": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["izin BPR", "izin BPRS", "pendirian BPR", "modal BPR", "kantor cabang BPR"],
@@ -48,6 +54,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-34-2025", "pojk-26-2024", "pojk-27-2016"]
   },
   "pojk-2-2024": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["governance syariah", "DPS", "audit syariah", "kepatuhan syariah"],
@@ -56,6 +63,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-12-2023", "pojk-16-2022", "pojk-4-2026"]
   },
   "pojk-12-2023": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Perlu cek pasal yang dicabut",
     aliases: ["izin UUS", "spin off UUS", "pemisahan UUS", "dana usaha UUS"],
@@ -64,6 +72,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-2-2024", "pojk-16-2022", "pojk-4-2026"]
   },
   "pojk-16-2022": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Perlu cek pasal yang dicabut",
     aliases: ["izin BUS", "pendirian bank syariah", "modal BUS", "kantor bank syariah"],
@@ -72,6 +81,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-2-2024", "pojk-12-2023", "pojk-27-2016"]
   },
   "pojk-12-2021": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Sumber OJK tersedia",
     aliases: ["izin bank umum", "bank digital", "pendirian bank", "kantor cabang bank"],
@@ -80,6 +90,7 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-26-2024", "padk-1-2026", "pojk-27-2016"]
   },
   "pojk-27-2016": {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Status perlu verifikasi",
     aliases: ["fit proper test", "fit and proper", "FPT", "penilaian pihak utama"],
@@ -105,8 +116,10 @@ function verifiedDateToIso(value) {
   return `${match[3]}-${months[match[2]]}-${String(match[1]).padStart(2, "0")}`;
 }
 
-function calculateFreshness(verifiedAt) {
-  const verifiedOn = verifiedDateToIso(verifiedAt);
+function calculateFreshness(verifiedOnValue, verifiedAt) {
+  const verifiedOn = /^\d{4}-\d{2}-\d{2}$/.test(String(verifiedOnValue || ""))
+    ? String(verifiedOnValue)
+    : verifiedDateToIso(verifiedAt);
   if (!verifiedOn) return { verifiedOn: "", ageDays: null, state: "unknown", label: "tanggal verifikasi tidak dikenali" };
   const verifiedTime = new Date(`${verifiedOn}T00:00:00Z`).getTime();
   const ageDays = Math.max(0, Math.floor((Date.now() - verifiedTime) / 86400000));
@@ -121,6 +134,7 @@ function calculateFreshness(verifiedAt) {
 
 REGULATIONS.forEach((regulation) => {
   Object.assign(regulation, {
+    verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
     verification: "Kurasi internal",
     aliases: [],
@@ -129,7 +143,7 @@ REGULATIONS.forEach((regulation) => {
     relatedIds: []
   }, V1_REGULATION_METADATA[regulation.id] || {});
 
-  const freshness = calculateFreshness(regulation.verifiedAt);
+  const freshness = calculateFreshness(regulation.verifiedOn, regulation.verifiedAt);
   regulation.integrity = {
     ...freshness,
     authority: "Otoritas Jasa Keuangan",
@@ -138,7 +152,6 @@ REGULATIONS.forEach((regulation) => {
     verificationMethod: "human-curated",
     interpretationLayer: "RegulaBank editorial summary"
   };
-  regulation.verification = `${regulation.verification} · ${freshness.label}`;
 });
 
 const SEARCH_SYNONYMS = {

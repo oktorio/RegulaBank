@@ -7,7 +7,7 @@
     <meta name="color-scheme" content="light">
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src https://ojk.go.id https://www.ojk.go.id; object-src 'none'; base-uri 'none'; form-action 'none'">
-    <title>RegulaBank V1.2</title>
+    <title>RegulaBank V1.2.1</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="v1.css">
 </head>
@@ -21,7 +21,7 @@
                 <strong>RegulaBank</strong>
                 <span>Asisten ketentuan perbankan</span>
             </div>
-            <span class="version-chip">V1.2</span>
+            <span class="version-chip">V1.2.1</span>
             <button class="icon-button" id="aboutButton" aria-label="Informasi aplikasi">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="12" r="9"></circle>
@@ -99,6 +99,10 @@
                             <span>Status</span>
                             <div class="filter-pills" id="statusFilters"></div>
                         </div>
+                        <div class="filter-group">
+                            <span>Integritas data</span>
+                            <div class="filter-pills" id="integrityFilters"></div>
+                        </div>
                         <button class="reset-filter" id="resetFilter">Atur ulang filter</button>
                     </div>
 
@@ -111,6 +115,7 @@
                                 <option value="latest">Terbaru</option>
                                 <option value="relevance">Paling relevan</option>
                                 <option value="number">Nomor</option>
+                                <option value="integrity">Perlu review dulu</option>
                             </select>
                         </label>
                     </div>
@@ -202,7 +207,7 @@
 
             <section class="about-view" id="aboutView" hidden>
                 <div class="page-intro">
-                    <span class="kicker">REGULABANK · V1.2</span>
+                    <span class="kicker">REGULABANK · V1.2.1</span>
                     <h2>Ruang kerja regulasi yang privat</h2>
                     <p>Penelusuran, PDF offline, catatan, checklist, dan jejak freshness tersimpan tanpa akun.</p>
                 </div>
@@ -229,7 +234,7 @@
                     <button class="danger-outline" id="clearOfflineData">Hapus semua PDF offline</button>
                 </div>
 
-                <h3 class="settings-title">Standar V1.2</h3>
+                <h3 class="settings-title">Standar V1.2.1</h3>
                 <div class="feature-grid">
                     <article><strong>Pencarian cerdas</strong><p>Nomor, judul, isi, sinonim, dan teks PDF offline.</p></article>
                     <article><strong>Jejak verifikasi</strong><p>Sumber, status indeks, tanggal terakhir diperiksa, dan freshness.</p></article>
@@ -242,7 +247,7 @@
                     Buka pusat regulasi OJK
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"></path></svg>
                 </a>
-                <p class="build-label">Indeks kurasi: 30 Juli 2026 · Build V1.2.0</p>
+                <p class="build-label">Indeks kurasi: 30 Juli 2026 · Build V1.2.1</p>
             </section>
         </main>
 

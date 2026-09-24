@@ -9,6 +9,9 @@
     "reviewAfterDays": 45,
     "staleAfterDays": 90
   },
+  "baseline": {
+    "maxEvidenceAgeDays": 7
+  },
   "network": {
     "connectTimeoutMs": 20000,
     "readTimeoutMs": 45000,

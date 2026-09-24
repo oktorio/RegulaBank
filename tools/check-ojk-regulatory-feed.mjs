@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import crypto from "node:crypto";
 import path from "node:path";
-import { loadPolicy, loadRegulatoryData, parseIndonesianDate, normalizeUrl, isAllowedAuthorityUrl, ROOT } from "./load-regulatory-data.mjs";
+import { loadBaselines, loadPolicy, loadRegulatoryData, parseIndonesianDate, normalizeUrl, isAllowedAuthorityUrl, ROOT } from "./load-regulatory-data.mjs";
 
 const args = process.argv.slice(2);
 const outputArg = args.indexOf("--output");
@@ -10,6 +10,7 @@ const outputPath = outputArg >= 0 && args[outputArg + 1] ? path.resolve(ROOT, ar
 const summaryPath = summaryArg >= 0 && args[summaryArg + 1] ? args[summaryArg + 1] : null;
 
 const policy = await loadPolicy();
+const baselines = await loadBaselines();
 const { regulations, metadata } = await loadRegulatoryData();
 const DAY_MS = 24 * 60 * 60 * 1000;
 const VOLATILE_LAST_MODIFIED_WINDOW_MS = 15 * 60 * 1000;
@@ -31,12 +32,10 @@ function plainText(value) {
     .trim());
 }
 
+const FINGERPRINT_METHOD = "visible-text-sha256-v1";
+
 function fingerprint(value) {
-  const normalized = value
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const normalized = plainText(value).normalize("NFKC").replace(/\s+/g, " ").trim();
   return crypto.createHash("sha256").update(normalized, "utf8").digest("hex");
 }
 
@@ -153,7 +152,33 @@ for (const regulation of regulations) {
     result.etag = response.headers.etag || null;
     result.lastModified = response.headers["last-modified"] || null;
     result.contentFingerprint = fingerprint(response.body);
+    result.fingerprintMethod = FINGERPRINT_METHOD;
     result.contentBytes = Buffer.byteLength(response.body, "utf8");
+
+    const baseline = baselines.records?.[regulation.id] || null;
+    if (!baseline) {
+      result.baseline = { approved: false, comparison: "missing" };
+      result.contentChangedFromBaseline = false;
+    } else if (baseline.fingerprintMethod !== FINGERPRINT_METHOD) {
+      result.baseline = {
+        approved: true,
+        approvedAt: baseline.approvedAt,
+        approvedBy: baseline.approvedBy,
+        fingerprintMethod: baseline.fingerprintMethod,
+        comparison: "method-mismatch"
+      };
+      result.contentChangedFromBaseline = false;
+    } else {
+      const matches = baseline.fingerprint === result.contentFingerprint;
+      result.baseline = {
+        approved: true,
+        approvedAt: baseline.approvedAt,
+        approvedBy: baseline.approvedBy,
+        fingerprintMethod: baseline.fingerprintMethod,
+        comparison: matches ? "match" : "changed"
+      };
+      result.contentChangedFromBaseline = !matches;
+    }
 
     const verified = parseIndonesianDate(result.verifiedAt);
     const lastModifiedAssessment = assessLastModified(result.lastModified, checkedAt);
@@ -218,7 +243,7 @@ try {
 }
 
 const report = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   generatedAt: checkedAt.toISOString(),
   authority: policy.authority,
   corpusSize: regulations.length,
@@ -231,6 +256,10 @@ const report = {
     reliableLastModifiedSignals: sourceChecks.filter((item) => item.lastModifiedSignal?.reliable).length,
     ignoredVolatileLastModifiedSignals: sourceChecks.filter((item) => item.lastModifiedSignal?.state === "volatile-request-time").length,
     modifiedAfterVerification: sourceChecks.filter((item) => item.serverModifiedAfterVerification).length,
+    baselineMatches: sourceChecks.filter((item) => item.baseline?.comparison === "match").length,
+    baselineChanges: sourceChecks.filter((item) => item.baseline?.comparison === "changed").length,
+    baselineMissing: sourceChecks.filter((item) => item.baseline?.comparison === "missing").length,
+    baselineMethodMismatches: sourceChecks.filter((item) => item.baseline?.comparison === "method-mismatch").length,
     bankingCandidates: hubCheck.candidates?.length || 0
   }
 };
@@ -245,6 +274,10 @@ const lines = [
   `Reliable Last-Modified signals: ${report.summary.reliableLastModifiedSignals}`,
   `Volatile Last-Modified signals ignored: ${report.summary.ignoredVolatileLastModifiedSignals}`,
   `Reliable server modifications newer than human verification: ${report.summary.modifiedAfterVerification}`,
+  `Approved fingerprint matches: ${report.summary.baselineMatches}`,
+  `Fingerprint changes vs approved baseline: ${report.summary.baselineChanges}`,
+  `Records without approved fingerprint baseline: ${report.summary.baselineMissing}`,
+  `Fingerprint method mismatches: ${report.summary.baselineMethodMismatches}`,
   `Unindexed banking-like candidates from OJK hub: ${report.summary.bankingCandidates}`,
   ""
 ];
@@ -262,6 +295,22 @@ const changed = sourceChecks.filter((item) => item.serverModifiedAfterVerificati
 if (changed.length) {
   lines.push("## Reliable server modification signals requiring review", "");
   for (const item of changed) lines.push(`- ${item.type} ${item.number} — server Last-Modified ${item.lastModified}; human verification ${item.verifiedAt}`);
+  lines.push("");
+}
+
+const baselineChanged = sourceChecks.filter((item) => item.baseline?.comparison === "changed");
+if (baselineChanged.length) {
+  lines.push("## Content fingerprint changes versus approved baseline", "");
+  for (const item of baselineChanged) {
+    lines.push(`- ${item.type} ${item.number} — approved by ${item.baseline.approvedBy} at ${item.baseline.approvedAt}; current visible-text fingerprint differs`);
+  }
+  lines.push("");
+}
+
+const baselineMissing = sourceChecks.filter((item) => item.baseline?.comparison === "missing");
+if (baselineMissing.length) {
+  lines.push("## Records without approved fingerprint baseline", "");
+  for (const item of baselineMissing) lines.push(`- ${item.type} ${item.number} — ${item.id}`);
   lines.push("");
 }
 
