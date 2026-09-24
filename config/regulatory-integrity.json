@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "authority": "Otoritas Jasa Keuangan",
+  "authorityHosts": [
+    "ojk.go.id"
+  ],
+  "regulatoryHubUrl": "https://ojk.go.id/id/regulasi/default.aspx",
+  "freshness": {
+    "reviewAfterDays": 45,
+    "staleAfterDays": 90
+  },
+  "network": {
+    "connectTimeoutMs": 20000,
+    "readTimeoutMs": 45000,
+    "maxResponseBytes": 4194304,
+    "maxRedirects": 5
+  },
+  "bankingCandidateKeywords": [
+    "bank",
+    "perbankan",
+    "bank umum",
+    "bank syariah",
+    "unit usaha syariah",
+    "bpr",
+    "bprs",
+    "bank perekonomian rakyat",
+    "kredit bank",
+    "bank kustodian"
+  ]
+}
