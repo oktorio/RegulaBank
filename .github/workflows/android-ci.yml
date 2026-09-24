@@ -41,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: RegulaBank-v1.3.2-build-log
+          name: RegulaBank-v1.3.3-build-log
           path: build.log
           if-no-files-found: warn
           retention-days: 7
@@ -50,12 +50,12 @@ jobs:
         run: gradle --no-daemon --stacktrace :app:lintDebug
 
       - name: Prepare installable APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk RegulaBank-v1.3.2-debug.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk RegulaBank-v1.3.3-debug.apk
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: RegulaBank-v1.3.2-debug-apk
-          path: RegulaBank-v1.3.2-debug.apk
+          name: RegulaBank-v1.3.3-debug-apk
+          path: RegulaBank-v1.3.3-debug.apk
           if-no-files-found: error
           retention-days: 30
