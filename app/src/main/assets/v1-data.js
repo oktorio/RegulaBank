@@ -89,14 +89,57 @@ const V1_REGULATION_METADATA = {
   }
 };
 
-REGULATIONS.forEach((regulation) => Object.assign(regulation, {
-  verifiedAt: "30 Juli 2026",
-  verification: "Kurasi internal",
-  aliases: [],
-  changeSummary: "Belum ada ringkasan perubahan yang terverifikasi.",
-  deadlines: ["Verifikasi tanggal dan kewajiban pada naskah resmi OJK"],
-  relatedIds: []
-}, V1_REGULATION_METADATA[regulation.id] || {}));
+const REGULATORY_FRESHNESS_POLICY = Object.freeze({
+  reviewAfterDays: 45,
+  staleAfterDays: 90
+});
+
+function verifiedDateToIso(value) {
+  const months = {
+    januari: "01", februari: "02", maret: "03", april: "04",
+    mei: "05", juni: "06", juli: "07", agustus: "08",
+    september: "09", oktober: "10", november: "11", desember: "12"
+  };
+  const match = String(value || "").trim().toLowerCase().match(/^(\d{1,2})\s+([a-z]+)\s+(\d{4})$/);
+  if (!match || !months[match[2]]) return "";
+  return `${match[3]}-${months[match[2]]}-${String(match[1]).padStart(2, "0")}`;
+}
+
+function calculateFreshness(verifiedAt) {
+  const verifiedOn = verifiedDateToIso(verifiedAt);
+  if (!verifiedOn) return { verifiedOn: "", ageDays: null, state: "unknown", label: "tanggal verifikasi tidak dikenali" };
+  const verifiedTime = new Date(`${verifiedOn}T00:00:00Z`).getTime();
+  const ageDays = Math.max(0, Math.floor((Date.now() - verifiedTime) / 86400000));
+  if (ageDays > REGULATORY_FRESHNESS_POLICY.staleAfterDays) {
+    return { verifiedOn, ageDays, state: "stale", label: "verifikasi kedaluwarsa" };
+  }
+  if (ageDays > REGULATORY_FRESHNESS_POLICY.reviewAfterDays) {
+    return { verifiedOn, ageDays, state: "review", label: "tinjau ulang verifikasi" };
+  }
+  return { verifiedOn, ageDays, state: "current", label: "verifikasi terkini" };
+}
+
+REGULATIONS.forEach((regulation) => {
+  Object.assign(regulation, {
+    verifiedAt: "30 Juli 2026",
+    verification: "Kurasi internal",
+    aliases: [],
+    changeSummary: "Belum ada ringkasan perubahan yang terverifikasi.",
+    deadlines: ["Verifikasi tanggal dan kewajiban pada naskah resmi OJK"],
+    relatedIds: []
+  }, V1_REGULATION_METADATA[regulation.id] || {});
+
+  const freshness = calculateFreshness(regulation.verifiedAt);
+  regulation.integrity = {
+    ...freshness,
+    authority: "Otoritas Jasa Keuangan",
+    sourceType: "official-regulation-page",
+    sourceUrl: regulation.source,
+    verificationMethod: "human-curated",
+    interpretationLayer: "RegulaBank editorial summary"
+  };
+  regulation.verification = `${regulation.verification} · ${freshness.label}`;
+});
 
 const SEARCH_SYNONYMS = {
   izin: ["perizinan", "persetujuan", "izin usaha", "permohonan"],
