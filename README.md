@@ -177,4 +177,6 @@ Bookmarks, notes, checklists, downloaded PDFs, and generated PDF search indexes 
 
 ## Version
 
-Current version: **V1.2.1 Regulatory Data Integrity** (`1.2.1`).
+Current version: **V1.3 Regulatory Workflows** (`1.3.0`).
+
+V1.3 adds interactive dashboard shortcuts, clearer official-document download affordances, and dedicated regulatory checklists for **Produk Bank Umum** (POJK 13/POJK.03/2021) and **Layanan Digital oleh Bank Umum** (POJK 21 Tahun 2023), including explicit references to the applicable official appendices.
