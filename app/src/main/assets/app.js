@@ -20,7 +20,8 @@
     offlineMatches: new Map(),
     offlineSearchTimer: null,
     noteSaveTimer: null,
-    savedAlertsOnly: readStore("regulabank-saved-alerts-only", false)
+    savedAlertsOnly: readStore("regulabank-saved-alerts-only", false),
+    attentionOnly: false
   };
 
   const elements = {
@@ -272,6 +273,12 @@
         if (state.categories.size && !state.categories.has(regulation.category)) return false;
         if (state.statuses.size && !state.statuses.has(regulation.status)) return false;
         if (state.integrityStates.size && !state.integrityStates.has(integrityState(regulation))) return false;
+        if (state.attentionOnly) {
+          const needsAttention = regulation.status.includes("dicabut")
+            || regulation.status.includes("verifikasi")
+            || ["review", "stale", "unknown"].includes(integrityState(regulation));
+          if (!needsAttention) return false;
+        }
         return true;
       });
 
@@ -974,11 +981,8 @@
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
+    state.attentionOnly = kind === "attention";
     if (kind === "upcoming") state.statuses.add("Akan berlaku");
-    if (kind === "attention") {
-      ["review", "stale", "unknown"].forEach((value) => state.integrityStates.add(value));
-      ["Sebagian dicabut", "Perlu verifikasi"].forEach((value) => state.statuses.add(value));
-    }
     state.view = "library";
     switchView("library");
     renderFilters();
