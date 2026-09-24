@@ -1022,7 +1022,18 @@
   }
 
   $(".trust-shortcut").forEach((button) => {
-    button.addEventListener("click", () => applyDashboardShortcut(button.dataset.shortcut));
+    const activate = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      applyDashboardShortcut(button.dataset.shortcut);
+    };
+    button.addEventListener("click", activate);
+    button.addEventListener("touchend", activate, { passive: false });
+    button.setAttribute("role", "button");
+    button.setAttribute("tabindex", "0");
+    button.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") activate(event);
+    });
   });
 
   $("#indexedCount").textContent = String(REGULATIONS.length);
