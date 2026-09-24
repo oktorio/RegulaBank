@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [main, v1.1-hardening, v1.2-data-integrity]
+    branches: [main, v1.1-hardening, v1.2-data-integrity, v1.3.1-batik-checklists]
   pull_request:
     branches: [main]
 
@@ -33,12 +33,12 @@ jobs:
         run: gradle --no-daemon --stacktrace :app:assembleDebug :app:lintDebug
 
       - name: Prepare installable APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk RegulaBank-v1.2.1-debug.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk RegulaBank-v1.3.1-debug.apk
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: RegulaBank-v1.2.1-debug-apk
-          path: RegulaBank-v1.2.1-debug.apk
+          name: RegulaBank-v1.3.1-debug-apk
+          path: RegulaBank-v1.3.1-debug.apk
           if-no-files-found: error
           retention-days: 30
