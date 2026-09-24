@@ -400,7 +400,7 @@
   }
 
   function citationFor(regulation) {
-    return `${regulation.type} ${regulation.number}, ${regulation.title}. Sumber resmi OJK: ${regulation.source} (indeks RegulaBank diperiksa ${regulation.verifiedAt}).`;
+    return `${regulation.type} ${regulation.number}, ${regulation.title}. Sumber resmi OJK: ${regulation.source} (indeks NARADA diperiksa ${regulation.verifiedAt}).`;
   }
 
   function nativeAvailable(method) {
@@ -595,7 +595,7 @@
   function shareCitation(regulation) {
     if (nativeAvailable("shareText")) {
       try {
-        NativeApp.shareText(`RegulaBank · ${regulation.type} ${regulation.number}`, citationFor(regulation));
+        NativeApp.shareText(`NARADA · ${regulation.type} ${regulation.number}`, citationFor(regulation));
         return;
       } catch (_) {}
     }
@@ -868,6 +868,10 @@
   $("#emptyReset").addEventListener("click", () => {
     elements.input.value = "";
     state.query = "";
+    elements.input.value = "";
+    previousQuery = "";
+    elements.input.parentElement.classList.remove("has-value");
+    state.offlineMatches.clear();
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
@@ -994,11 +998,14 @@
     state.integrityStates.clear();
     state.attentionOnly = kind === "attention";
     if (kind === "upcoming") state.statuses.add("Akan berlaku");
-    state.view = "library";
+    state.sort = kind === "attention" ? "integrity" : "latest";
+    elements.sort.value = state.sort;
     setView("library");
     renderFilters();
     renderLibrary();
-    window.scrollTo({ top: document.querySelector(".library").offsetTop - 64, behavior: "smooth" });
+    renderRecentSearches();
+    const library = document.querySelector(".library");
+    if (library) library.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   $(".trust-shortcut").forEach((button) => {
