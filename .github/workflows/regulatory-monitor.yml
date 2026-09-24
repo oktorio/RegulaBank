@@ -1,0 +1,64 @@
+name: Regulatory Integrity
+
+on:
+  push:
+    branches: [main, v1.2-data-integrity]
+    paths:
+      - "app/src/main/assets/data.js"
+      - "app/src/main/assets/v1-data.js"
+      - "config/regulatory-integrity.json"
+      - "tools/**"
+      - ".github/workflows/regulatory-monitor.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/src/main/assets/data.js"
+      - "app/src/main/assets/v1-data.js"
+      - "config/regulatory-integrity.json"
+      - "tools/**"
+      - ".github/workflows/regulatory-monitor.yml"
+  schedule:
+    - cron: "17 1 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate curated regulatory data
+        run: node tools/validate-regulatory-data.mjs
+
+  online-monitor:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check OJK sources and discover candidate regulations
+        run: node tools/check-ojk-regulatory-feed.mjs --output reports/ojk-regulatory-monitor.json --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload monitoring evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: ojk-regulatory-monitor-${{ github.run_id }}
+          path: reports/ojk-regulatory-monitor.json
+          retention-days: 30
