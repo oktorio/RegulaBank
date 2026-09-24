@@ -6,6 +6,7 @@ on:
     paths:
       - "app/src/main/assets/data.js"
       - "app/src/main/assets/v1-data.js"
+      - "app/src/main/assets/app.js"
       - "config/regulatory-integrity.json"
       - "config/regulatory-baselines.json"
       - "tools/**"
@@ -15,6 +16,7 @@ on:
     paths:
       - "app/src/main/assets/data.js"
       - "app/src/main/assets/v1-data.js"
+      - "app/src/main/assets/app.js"
       - "config/regulatory-integrity.json"
       - "config/regulatory-baselines.json"
       - "tools/**"
