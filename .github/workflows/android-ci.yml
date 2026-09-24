@@ -35,7 +35,16 @@ jobs:
           rm app/src/main/res/drawable/regulabank_logo.jpg.b64
 
       - name: Build APK
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
+        run: gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee build.log
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RegulaBank-v1.3.2-build-log
+          path: build.log
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Lint
         run: gradle --no-daemon --stacktrace :app:lintDebug
