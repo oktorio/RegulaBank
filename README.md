@@ -12,6 +12,8 @@ RegulaBank is an Android-first regulatory workspace for searching, reading, book
 - Build a local text index from downloaded PDFs for offline search.
 - Save bookmarks, personal notes, regulatory alerts, and licensing checklists locally on the device.
 - Copy and share citations through a constrained Android WebView bridge.
+- Validate curated regulation records automatically before merge.
+- Monitor official OJK sources for reachability, server-side modification signals, and unindexed banking-related candidates.
 
 ## Architecture
 
@@ -22,12 +24,15 @@ RegulaBank is intentionally small and offline-first:
 - `PdfDownloadBridge.java` — official OJK PDF discovery/download bridge.
 - `AppBridge.java` — clipboard/share helpers, offline indexing, search, and storage management.
 - `PdfProvider.java` — read-only content provider for locally stored PDFs.
+- `tools/validate-regulatory-data.mjs` — static integrity validation for the curated corpus.
+- `tools/check-ojk-regulatory-feed.mjs` — online evidence collection and candidate discovery against OJK sources.
+- `config/regulatory-integrity.json` — authority allow-list, freshness thresholds, monitoring limits, and discovery keywords.
 
-The app does not require an account or a backend service for its current V1 feature set.
+The app does not require an account or a backend service for its current feature set.
 
 ## Security model
 
-V1.1 applies the following controls:
+V1.1+ applies the following controls:
 
 - Cleartext network traffic is disabled.
 - Native PDF downloads are restricted to HTTPS URLs under `ojk.go.id` and its subdomains.
@@ -38,6 +43,50 @@ V1.1 applies the following controls:
 - The PDF content provider is not exported and grants temporary read access only.
 - WebView debugging is enabled only for debuggable builds.
 - App backup is disabled.
+
+## Regulatory data integrity model
+
+V1.2 separates **automated detection** from **human regulatory verification**.
+
+### Automated controls
+
+The static validator checks:
+
+- regulation ID format and uniqueness;
+- mandatory fields and supported status values;
+- ISO issue dates;
+- official HTTPS OJK source URLs;
+- metadata completeness;
+- verification age against configured review/stale thresholds;
+- referential integrity for related regulations;
+- alert and checklist references.
+
+The online monitor checks:
+
+- whether each indexed OJK source remains reachable;
+- HTTP status, final URL, ETag, Last-Modified and a content fingerprint;
+- whether the server reports a modification date later than the recorded human verification date;
+- the OJK regulatory hub for banking-like regulation links that are not yet indexed.
+
+### Human-review boundary
+
+A monitoring signal is **evidence only**. It must not automatically change a regulation's legal status, effective date, interpretation, amendment relationship, or supervisory conclusion. Those fields remain curated and require human verification against the authoritative OJK text.
+
+This prevents a CMS page update, metadata change, false-positive keyword match, or transient web behavior from being treated as a legal/regulatory change.
+
+## GitHub monitoring
+
+`.github/workflows/regulatory-monitor.yml` runs static validation on relevant pushes and pull requests. An online monitoring run is also scheduled weekly and can be started manually with `workflow_dispatch`.
+
+Online runs publish a JSON evidence artifact containing:
+
+- source reachability results;
+- final URLs and response metadata;
+- content fingerprints;
+- sources modified after the last recorded human verification;
+- candidate OJK regulations not yet present in the curated corpus.
+
+The workflow intentionally does **not** auto-commit detected regulatory changes.
 
 ## Build requirements
 
@@ -62,7 +111,17 @@ Run lint with:
 gradle :app:lintDebug
 ```
 
-GitHub Actions runs both commands on pushes and pull requests.
+Validate regulatory data with:
+
+```bash
+node tools/validate-regulatory-data.mjs
+```
+
+Run the online OJK monitor manually with:
+
+```bash
+node tools/check-ojk-regulatory-feed.mjs --output reports/ojk-regulatory-monitor.json
+```
 
 ## Regulation data maintenance
 
@@ -73,14 +132,13 @@ The curated dataset is stored in:
 
 For each regulation update:
 
-1. Verify the authoritative OJK source URL.
-2. Verify the regulation status and effective date.
-3. Check whether another regulation amends, partially revokes, replaces, or supplements it.
-4. Update the human-readable summary and action/deadline metadata.
-5. Record the verification date.
-6. Build and lint before merging.
-
-A future version should automate freshness checks and distinguish machine-detected changes from human-verified regulatory interpretation.
+1. Review the monitoring evidence, if any.
+2. Open and verify the authoritative OJK source.
+3. Verify regulation status and effective date.
+4. Check whether another regulation amends, partially revokes, replaces, or supplements it.
+5. Update the human-readable summary and action/deadline metadata only after verification.
+6. Record the human verification date.
+7. Run the regulatory validator, Android build, and lint before merging.
 
 ## Privacy
 
@@ -88,12 +146,13 @@ Bookmarks, notes, checklists, downloaded PDFs, and generated PDF search indexes 
 
 ## Known limitations / next priorities
 
-- The regulation corpus is curated and is not yet synchronized automatically with the full OJK regulatory catalogue.
-- Verification freshness is metadata-driven; stale records should be surfaced more prominently in a future release.
+- Candidate discovery uses rule-based banking keywords and can produce false positives or miss regulations with indirect titles.
+- `Last-Modified` and ETag are web-server signals, not proof that legal content changed.
+- The regulation corpus is still curated rather than automatically synchronized with the full OJK catalogue.
 - Offline PDF indexing is text extraction only; image-only/scanned PDFs require OCR to become searchable.
 - Release shrinking/obfuscation remains disabled until WebView bridge and PDFBox release builds have automated regression coverage.
 - A Gradle Wrapper should be added once wrapper binary generation is performed from a trusted Gradle installation.
 
 ## Version
 
-Current development branch: **V1.1 hardening** (`v1.1-hardening`).
+Current development branch: **V1.2 Regulatory Data Integrity** (`v1.2-data-integrity`).
