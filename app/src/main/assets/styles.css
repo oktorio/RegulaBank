@@ -1094,3 +1094,13 @@ body.sheet-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* V1.3 interactive dashboard shortcuts */
+.trust-strip { display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid var(--line); background:var(--white); }
+.trust-shortcut { min-width:0; padding:15px 8px 13px; border:0; border-right:1px solid var(--line); background:var(--white); text-align:center; cursor:pointer; }
+.trust-shortcut:last-child { border-right:0; }
+.trust-shortcut strong { display:block; color:var(--green-800); font-family:Georgia,"Times New Roman",serif; font-size:20px; }
+.trust-shortcut span { display:block; margin-top:3px; color:var(--ink-soft); font-size:9px; font-weight:700; }
+.trust-shortcut small { display:block; margin-top:5px; color:var(--green-700); font-size:8px; font-weight:700; }
+.trust-shortcut:active { background:var(--green-50); }
+.checklist-basis { display:block; margin-top:4px; color:var(--green-700); font-size:9px; font-style:normal; font-weight:600; line-height:1.4; }
