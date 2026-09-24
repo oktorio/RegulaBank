@@ -11,6 +11,8 @@ const summaryPath = summaryArg >= 0 && args[summaryArg + 1] ? args[summaryArg + 
 
 const policy = await loadPolicy();
 const { regulations, metadata } = await loadRegulatoryData();
+const DAY_MS = 24 * 60 * 60 * 1000;
+const VOLATILE_LAST_MODIFIED_WINDOW_MS = 15 * 60 * 1000;
 
 function decodeEntities(value) {
   return value
@@ -36,6 +38,41 @@ function fingerprint(value) {
     .replace(/\s+/g, " ")
     .trim();
   return crypto.createHash("sha256").update(normalized, "utf8").digest("hex");
+}
+
+function freshnessFromVerification(verifiedAt, checkedAt) {
+  const verified = parseIndonesianDate(verifiedAt);
+  if (!verified) return { verificationAgeDays: null, freshnessState: "unknown", verificationReviewDue: true };
+  const age = Math.max(0, Math.floor((checkedAt.getTime() - verified.getTime()) / DAY_MS));
+  const freshnessState = age > policy.freshness.staleAfterDays
+    ? "stale"
+    : age > policy.freshness.reviewAfterDays
+      ? "review"
+      : "current";
+  return {
+    verificationAgeDays: age,
+    freshnessState,
+    verificationReviewDue: freshnessState !== "current"
+  };
+}
+
+function assessLastModified(rawValue, checkedAt) {
+  if (!rawValue) return { state: "missing", reliable: false, date: null };
+  const parsed = new Date(rawValue);
+  if (Number.isNaN(parsed.getTime())) return { state: "invalid", reliable: false, date: null };
+  const distanceFromCheck = Math.abs(checkedAt.getTime() - parsed.getTime());
+  if (distanceFromCheck <= VOLATILE_LAST_MODIFIED_WINDOW_MS) {
+    return {
+      state: "volatile-request-time",
+      reliable: false,
+      date: parsed,
+      reason: "Header tracks request time and is not treated as evidence of a legal-content change."
+    };
+  }
+  if (parsed.getTime() > checkedAt.getTime() + VOLATILE_LAST_MODIFIED_WINDOW_MS) {
+    return { state: "future", reliable: false, date: parsed, reason: "Header is unexpectedly in the future." };
+  }
+  return { state: "usable", reliable: true, date: parsed };
 }
 
 async function fetchLimited(urlValue) {
@@ -105,7 +142,8 @@ for (const regulation of regulations) {
     title: regulation.title,
     source: regulation.source,
     verifiedAt: metadata[regulation.id]?.verifiedAt || null,
-    ok: false
+    ok: false,
+    ...freshnessFromVerification(metadata[regulation.id]?.verifiedAt || null, checkedAt)
   };
   try {
     const response = await fetchLimited(regulation.source);
@@ -118,9 +156,15 @@ for (const regulation of regulations) {
     result.contentBytes = Buffer.byteLength(response.body, "utf8");
 
     const verified = parseIndonesianDate(result.verifiedAt);
-    const lastModified = result.lastModified ? new Date(result.lastModified) : null;
+    const lastModifiedAssessment = assessLastModified(result.lastModified, checkedAt);
+    result.lastModifiedSignal = {
+      state: lastModifiedAssessment.state,
+      reliable: lastModifiedAssessment.reliable,
+      reason: lastModifiedAssessment.reason || null
+    };
     result.serverModifiedAfterVerification = Boolean(
-      verified && lastModified && !Number.isNaN(lastModified.getTime()) && lastModified.getTime() > verified.getTime() + 24 * 60 * 60 * 1000
+      verified && lastModifiedAssessment.reliable && lastModifiedAssessment.date &&
+      lastModifiedAssessment.date.getTime() > verified.getTime() + DAY_MS
     );
     if (!response.ok) result.error = `HTTP ${response.status}`;
   } catch (error) {
@@ -153,7 +197,7 @@ try {
     if (!resolved.pathname.toLowerCase().endsWith(".aspx")) continue;
 
     const normalized = normalizeUrl(resolved.toString());
-    if (knownSources.has(normalized)) continue;
+    if (normalized === normalizeUrl(policy.regulatoryHubUrl) || knownSources.has(normalized)) continue;
     const label = plainText(match[2]);
     const haystack = `${normalized} ${label}`.toLowerCase();
     const matchedKeywords = policy.bankingCandidateKeywords.filter((keyword) => haystack.includes(keyword.toLowerCase()));
@@ -174,7 +218,7 @@ try {
 }
 
 const report = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: checkedAt.toISOString(),
   authority: policy.authority,
   corpusSize: regulations.length,
@@ -183,6 +227,9 @@ const report = {
   summary: {
     reachableSources: sourceChecks.filter((item) => item.ok).length,
     sourceErrors: sourceChecks.filter((item) => !item.ok).length,
+    verificationReviewDue: sourceChecks.filter((item) => item.verificationReviewDue).length,
+    reliableLastModifiedSignals: sourceChecks.filter((item) => item.lastModifiedSignal?.reliable).length,
+    ignoredVolatileLastModifiedSignals: sourceChecks.filter((item) => item.lastModifiedSignal?.state === "volatile-request-time").length,
     modifiedAfterVerification: sourceChecks.filter((item) => item.serverModifiedAfterVerification).length,
     bankingCandidates: hubCheck.candidates?.length || 0
   }
@@ -194,14 +241,26 @@ const lines = [
   `Generated: ${report.generatedAt}`,
   `Indexed sources reachable: ${report.summary.reachableSources}/${report.corpusSize}`,
   `Sources with errors: ${report.summary.sourceErrors}`,
-  `Server Last-Modified newer than human verification: ${report.summary.modifiedAfterVerification}`,
+  `Human verification review due by age: ${report.summary.verificationReviewDue}`,
+  `Reliable Last-Modified signals: ${report.summary.reliableLastModifiedSignals}`,
+  `Volatile Last-Modified signals ignored: ${report.summary.ignoredVolatileLastModifiedSignals}`,
+  `Reliable server modifications newer than human verification: ${report.summary.modifiedAfterVerification}`,
   `Unindexed banking-like candidates from OJK hub: ${report.summary.bankingCandidates}`,
   ""
 ];
 
+const dueForReview = sourceChecks.filter((item) => item.verificationReviewDue);
+if (dueForReview.length) {
+  lines.push("## Curated records due for scheduled human review", "");
+  for (const item of dueForReview) {
+    lines.push(`- ${item.type} ${item.number} — verified ${item.verifiedAt}; age ${item.verificationAgeDays ?? "unknown"} days; state ${item.freshnessState}`);
+  }
+  lines.push("");
+}
+
 const changed = sourceChecks.filter((item) => item.serverModifiedAfterVerification);
 if (changed.length) {
-  lines.push("## Sources requiring review", "");
+  lines.push("## Reliable server modification signals requiring review", "");
   for (const item of changed) lines.push(`- ${item.type} ${item.number} — server Last-Modified ${item.lastModified}; human verification ${item.verifiedAt}`);
   lines.push("");
 }
@@ -214,7 +273,7 @@ if (failed.length) {
 }
 
 if (hubCheck.candidates?.length) {
-  lines.push("## Candidate OJK regulations not yet indexed", "");
+  lines.push("## Candidate OJK banking regulations not yet indexed", "");
   for (const item of hubCheck.candidates.slice(0, 20)) {
     lines.push(`- ${item.label} — ${item.url} _(matched: ${item.matchedKeywords.join(", ")})_`);
   }
