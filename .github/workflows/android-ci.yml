@@ -2,7 +2,7 @@ name: Android CI
 
 on:
   push:
-    branches: [main, v1.1-hardening]
+    branches: [main, v1.1-hardening, v1.2-data-integrity]
   pull_request:
     branches: [main]
 
