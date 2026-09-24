@@ -13,7 +13,7 @@ RegulaBank is an Android-first regulatory workspace for searching, reading, book
 - Save bookmarks, personal notes, regulatory alerts, and licensing checklists locally on the device.
 - Copy and share citations through a constrained Android WebView bridge.
 - Validate curated regulation records automatically before merge.
-- Monitor official OJK sources for reachability, server-side modification signals, and unindexed banking-related candidates.
+- Monitor official OJK sources for reachability, trustworthy server signals, content fingerprints, and unindexed banking-related candidates.
 
 ## Architecture
 
@@ -26,7 +26,7 @@ RegulaBank is intentionally small and offline-first:
 - `PdfProvider.java` — read-only content provider for locally stored PDFs.
 - `tools/validate-regulatory-data.mjs` — static integrity validation for the curated corpus.
 - `tools/check-ojk-regulatory-feed.mjs` — online evidence collection and candidate discovery against OJK sources.
-- `config/regulatory-integrity.json` — authority allow-list, freshness thresholds, monitoring limits, and discovery keywords.
+- `config/regulatory-integrity.json` — authority allow-list, freshness thresholds, monitoring limits, and banking-specific discovery keywords.
 
 The app does not require an account or a backend service for its current feature set.
 
@@ -59,14 +59,18 @@ The static validator checks:
 - metadata completeness;
 - verification age against configured review/stale thresholds;
 - referential integrity for related regulations;
+- runtime freshness/provenance fields;
 - alert and checklist references.
 
 The online monitor checks:
 
 - whether each indexed OJK source remains reachable;
 - HTTP status, final URL, ETag, Last-Modified and a content fingerprint;
-- whether the server reports a modification date later than the recorded human verification date;
-- the OJK regulatory hub for banking-like regulation links that are not yet indexed.
+- scheduled human-review age from the recorded verification date;
+- whether a usable server modification signal is newer than the human verification;
+- the OJK regulatory hub for banking-specific regulation links that are not yet indexed.
+
+`Last-Modified` values close to the current request time are treated as **volatile** and ignored as change evidence. This specifically avoids treating dynamic CMS response headers as legal-content changes. Content fingerprints are retained in the monitoring artifact as evidence for later comparison.
 
 ### Human-review boundary
 
@@ -76,15 +80,16 @@ This prevents a CMS page update, metadata change, false-positive keyword match, 
 
 ## GitHub monitoring
 
-`.github/workflows/regulatory-monitor.yml` runs static validation on relevant pushes and pull requests. An online monitoring run is also scheduled weekly and can be started manually with `workflow_dispatch`.
+`.github/workflows/regulatory-monitor.yml` runs static validation on relevant pushes and pull requests. An online monitoring run is scheduled weekly and can also be started manually with `workflow_dispatch`.
 
 Online runs publish a JSON evidence artifact containing:
 
 - source reachability results;
 - final URLs and response metadata;
 - content fingerprints;
-- sources modified after the last recorded human verification;
-- candidate OJK regulations not yet present in the curated corpus.
+- freshness state based on the last human verification date;
+- reliable server modification signals, when available;
+- candidate OJK banking regulations not yet present in the curated corpus.
 
 The workflow intentionally does **not** auto-commit detected regulatory changes.
 
@@ -128,7 +133,7 @@ node tools/check-ojk-regulatory-feed.mjs --output reports/ojk-regulatory-monitor
 The curated dataset is stored in:
 
 - `app/src/main/assets/data.js` — primary regulation records.
-- `app/src/main/assets/v1-data.js` — verification metadata, aliases, relationships, alerts, and checklist templates.
+- `app/src/main/assets/v1-data.js` — verification metadata, aliases, relationships, alerts, checklist templates, and runtime freshness/provenance.
 
 For each regulation update:
 
@@ -146,8 +151,9 @@ Bookmarks, notes, checklists, downloaded PDFs, and generated PDF search indexes 
 
 ## Known limitations / next priorities
 
-- Candidate discovery uses rule-based banking keywords and can produce false positives or miss regulations with indirect titles.
-- `Last-Modified` and ETag are web-server signals, not proof that legal content changed.
+- Candidate discovery uses rule-based banking keywords and can still miss regulations with indirect titles.
+- ETag and Last-Modified are web-server signals, not proof that legal content changed; volatile request-time headers are ignored.
+- Content fingerprints are collected as evidence but are not yet compared against a persistent, human-approved baseline.
 - The regulation corpus is still curated rather than automatically synchronized with the full OJK catalogue.
 - Offline PDF indexing is text extraction only; image-only/scanned PDFs require OCR to become searchable.
 - Release shrinking/obfuscation remains disabled until WebView bridge and PDFBox release builds have automated regression coverage.
@@ -155,4 +161,4 @@ Bookmarks, notes, checklists, downloaded PDFs, and generated PDF search indexes 
 
 ## Version
 
-Current development branch: **V1.2 Regulatory Data Integrity** (`v1.2-data-integrity`).
+Current version: **V1.2 Regulatory Data Integrity** (`1.2.0`).
