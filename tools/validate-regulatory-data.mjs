@@ -1,11 +1,12 @@
 import { daysBetween, isAllowedAuthorityUrl, loadPolicy, loadRegulatoryData, parseIndonesianDate } from "./load-regulatory-data.mjs";
 
 const policy = await loadPolicy();
-const { regulations, metadata, alerts, checklists } = await loadRegulatoryData();
+const { regulations, metadata, alerts, checklists, freshnessPolicy } = await loadRegulatoryData();
 
 const errors = [];
 const warnings = [];
 const allowedStatuses = new Set(["Berlaku", "Akan berlaku", "Sebagian dicabut", "Perlu verifikasi"]);
+const allowedFreshnessStates = new Set(["current", "review", "stale", "unknown"]);
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/;
 const ids = new Set();
 const sources = new Set();
@@ -20,6 +21,10 @@ function warn(scope, message) {
 
 if (!Array.isArray(regulations) || regulations.length === 0) {
   error("dataset", "REGULATIONS must contain at least one regulation.");
+}
+
+if (!freshnessPolicy || freshnessPolicy.reviewAfterDays !== policy.freshness.reviewAfterDays || freshnessPolicy.staleAfterDays !== policy.freshness.staleAfterDays) {
+  error("freshness-policy", "Runtime freshness thresholds must match config/regulatory-integrity.json.");
 }
 
 for (const regulation of regulations) {
@@ -69,6 +74,17 @@ for (const regulation of regulations) {
     } else if (age > policy.freshness.reviewAfterDays) {
       warn(scope, `Verification review is due (${age} days; review threshold ${policy.freshness.reviewAfterDays}).`);
     }
+  }
+
+  const integrity = regulation.integrity;
+  if (!integrity || typeof integrity !== "object") {
+    error(scope, "Runtime integrity/provenance metadata is missing.");
+  } else {
+    if (!allowedFreshnessStates.has(integrity.state)) error(scope, `Unsupported freshness state: ${integrity.state}`);
+    if (integrity.authority !== policy.authority) error(scope, `Integrity authority must be ${policy.authority}.`);
+    if (integrity.sourceUrl !== regulation.source) error(scope, "Integrity sourceUrl must match the regulation source.");
+    if (integrity.verificationMethod !== "human-curated") error(scope, "verificationMethod must preserve the human-curated boundary.");
+    if (integrity.verifiedOn && !/^\d{4}-\d{2}-\d{2}$/.test(integrity.verifiedOn)) error(scope, "integrity.verifiedOn must be ISO YYYY-MM-DD.");
   }
 }
 
