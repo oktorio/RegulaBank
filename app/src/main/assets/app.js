@@ -739,6 +739,7 @@
   }
 
   function runSearch(query, save = false) {
+    state.attentionOnly = false;
     setView("library");
     elements.input.value = query;
     elements.input.dispatchEvent(new Event("input"));
@@ -846,6 +847,7 @@
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
+    state.attentionOnly = false;
     renderFilters();
     renderLibrary();
   });
@@ -861,6 +863,7 @@
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
+    state.attentionOnly = false;
     state.offlineMatches.clear();
     previousQuery = "";
     elements.input.parentElement.classList.remove("has-value");
