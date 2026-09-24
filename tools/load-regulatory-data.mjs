@@ -38,7 +38,8 @@ export async function loadRegulatoryData() {
   const exportSource = `\n;globalThis.__REGULATIONS = REGULATIONS;\n` +
     `globalThis.__METADATA = V1_REGULATION_METADATA;\n` +
     `globalThis.__ALERTS = REGULATORY_ALERTS;\n` +
-    `globalThis.__CHECKLISTS = LICENSING_CHECKLISTS;\n`;
+    `globalThis.__CHECKLISTS = LICENSING_CHECKLISTS;\n` +
+    `globalThis.__FRESHNESS_POLICY = REGULATORY_FRESHNESS_POLICY;\n`;
 
   vm.runInContext(`${dataSource}\n${metadataSource}\n${exportSource}`, context, {
     filename: "regulabank-regulatory-data.js",
@@ -49,7 +50,8 @@ export async function loadRegulatoryData() {
     regulations: structuredClone(context.__REGULATIONS),
     metadata: structuredClone(context.__METADATA),
     alerts: structuredClone(context.__ALERTS),
-    checklists: structuredClone(context.__CHECKLISTS)
+    checklists: structuredClone(context.__CHECKLISTS),
+    freshnessPolicy: structuredClone(context.__FRESHNESS_POLICY)
   };
 }
 
