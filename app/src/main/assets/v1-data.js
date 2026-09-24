@@ -80,6 +80,24 @@ const V1_REGULATION_METADATA = {
     deadlines: ["Gunakan POJK 2 Tahun 2024 untuk aspek tata kelola syariah", "Verifikasi ketentuan perizinan dan jaringan kantor pada naskah terbaru"],
     relatedIds: ["pojk-2-2024", "pojk-12-2023", "pojk-27-2016"]
   },
+  "pojk-21-2023": {
+    verifiedOn: "2026-09-24",
+    verifiedAt: "24 September 2026",
+    verification: "Sumber resmi OJK diverifikasi",
+    aliases: ["layanan digital", "LDBU", "izin layanan digital", "digital banking", "mitra bank"],
+    changeSummary: "Menggantikan kerangka layanan perbankan digital sebelumnya dan mengatur perizinan serta pelaporan Layanan Digital secara principle-based.",
+    deadlines: ["Gunakan Lampiran I-IV bersama naskah utama untuk kebutuhan perizinan dan pelaporan", "Verifikasi klasifikasi layanan dan kewajiban izin/laporan sebelum implementasi"],
+    relatedIds: ["pojk-13-2021", "padk-1-2026", "pojk-12-2021"]
+  },
+  "pojk-13-2021": {
+    verifiedOn: "2026-09-24",
+    verifiedAt: "24 September 2026",
+    verification: "Sumber resmi OJK diverifikasi",
+    aliases: ["produk bank", "produk dasar", "produk lanjutan", "RPPB", "izin produk"],
+    changeSummary: "Kerangka utama penyelenggaraan dan perizinan Produk Bank Umum dengan pendekatan berbasis risiko.",
+    deadlines: ["Klasifikasikan produk menggunakan Lampiran daftar Produk Bank Dasar", "Pastikan produk baru tercantum dalam RPPB dan tentukan jalur izin atau laporan sebelum peluncuran"],
+    relatedIds: ["pojk-21-2023", "pojk-12-2021", "padk-1-2026"]
+  },
   "pojk-12-2021": {
     verifiedOn: "2026-07-30",
     verifiedAt: "30 Juli 2026",
@@ -166,6 +184,8 @@ const SEARCH_SYNONYMS = {
   cabang: ["jaringan kantor", "kantor cabang"],
   syariah: ["bus", "uus", "bprs", "prinsip syariah"],
   laporan: ["pelaporan", "laporan berkala", "laporan insidental"],
+  produk: ["produk bank", "produk dasar", "produk lanjutan", "RPPB"],
+  digital: ["layanan digital", "digital banking", "LDBU", "media elektronik"],
   dicabut: ["pencabutan", "tidak berlaku", "sebagian dicabut"]
 };
 
@@ -225,6 +245,35 @@ const LICENSING_CHECKLISTS = [
       { id: "approval", group: "Perizinan", title: "Validasi apakah diperlukan laporan atau persetujuan OJK" },
       { id: "resilience", group: "Ketahanan", title: "Uji kesinambungan layanan dan pemulihan bencana" },
       { id: "evidence", group: "Bukti", title: "Arsipkan keputusan, hasil pengujian, laporan, dan surat persetujuan" }
+    ]
+  },
+  {
+    id: "produk-bank",
+    title: "Persetujuan / pelaporan Produk Bank Umum",
+    regulationId: "pojk-13-2021",
+    description: "Template klasifikasi dan kesiapan Produk Bank baru berdasarkan POJK 13/POJK.03/2021. Gunakan lampiran daftar Produk Bank Dasar sebagai acuan klasifikasi.",
+    items: [
+      { id: "classify", group: "Klasifikasi", title: "Tentukan Produk Bank Dasar atau Produk Bank Lanjutan", basis: "POJK 13/2021 · Lampiran daftar Produk Bank Dasar" },
+      { id: "rppb", group: "Perencanaan", title: "Pastikan rencana produk tercantum dalam RPPB", basis: "POJK 13/2021 · Rencana Penyelenggaraan Produk Bank" },
+      { id: "risk", group: "Manajemen risiko", title: "Dokumentasikan profil risiko, mitigasi, kontrol, dan kesiapan operasional", basis: "POJK 13/2021 · penyelenggaraan produk berbasis risiko" },
+      { id: "approval-path", group: "Perizinan", title: "Tentukan jalur persetujuan, izin, atau pelaporan yang berlaku", basis: "POJK 13/2021 · mekanisme penyelenggaraan Produk Bank" },
+      { id: "consumer", group: "Nasabah", title: "Validasi transparansi, pelindungan nasabah, dan materi komunikasi produk", basis: "POJK 13/2021 · prinsip penyelenggaraan Produk Bank" },
+      { id: "evidence", group: "Dokumen", title: "Lampirkan analisis klasifikasi, persetujuan internal, RPPB, hasil uji, dan bukti penyampaian ke OJK", basis: "POJK 13/2021 · naskah dan lampiran resmi" }
+    ]
+  },
+  {
+    id: "layanan-digital",
+    title: "Persetujuan Layanan Digital Bank Umum",
+    regulationId: "pojk-21-2023",
+    description: "Template kesiapan Layanan Digital berdasarkan POJK 21 Tahun 2023, termasuk dokumen dan format pada Lampiran I-IV.",
+    items: [
+      { id: "scope", group: "Klasifikasi", title: "Tetapkan cakupan Layanan Digital, fitur, kanal, dan keterkaitan dengan Produk Bank", basis: "POJK 21/2023 · cakupan Layanan Digital" },
+      { id: "infrastructure", group: "Teknologi", title: "Buktikan kesiapan infrastruktur TI dan pengelolaannya", basis: "POJK 21/2023 · persyaratan penyelenggaraan" },
+      { id: "partner", group: "Kemitraan", title: "Lakukan due diligence mitra, perizinan mitra, kontrak, akses data, dan pembagian tanggung jawab", basis: "POJK 21/2023 · kerja sama dengan mitra" },
+      { id: "privacy", group: "Nasabah & data", title: "Validasi identifikasi/verifikasi nasabah, consent, pelindungan data, dan pengelolaan hak akses mitra", basis: "POJK 21/2023 · pelindungan nasabah dan data pribadi" },
+      { id: "permit", group: "Perizinan", title: "Siapkan permohonan izin beserta dokumen sesuai format/lampiran yang berlaku", basis: "POJK 21/2023 · Lampiran I-IV" },
+      { id: "realization", group: "Pelaporan", title: "Siapkan laporan realisasi, daftar mitra, dan laporan evaluasi sesuai kewajiban", basis: "POJK 21/2023 · Lampiran I-IV dan mekanisme pelaporan" },
+      { id: "evidence", group: "Dokumen", title: "Arsipkan persetujuan internal, hasil pengujian, dokumen permohonan, surat OJK, dan bukti pelaporan", basis: "POJK 21/2023 · naskah dan lampiran resmi" }
     ]
   }
 ];

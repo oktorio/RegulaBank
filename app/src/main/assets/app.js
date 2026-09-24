@@ -20,7 +20,8 @@
     offlineMatches: new Map(),
     offlineSearchTimer: null,
     noteSaveTimer: null,
-    savedAlertsOnly: readStore("regulabank-saved-alerts-only", false)
+    savedAlertsOnly: readStore("regulabank-saved-alerts-only", false),
+    attentionOnly: false
   };
 
   const elements = {
@@ -272,6 +273,12 @@
         if (state.categories.size && !state.categories.has(regulation.category)) return false;
         if (state.statuses.size && !state.statuses.has(regulation.status)) return false;
         if (state.integrityStates.size && !state.integrityStates.has(integrityState(regulation))) return false;
+        if (state.attentionOnly) {
+          const needsAttention = regulation.status.includes("dicabut")
+            || regulation.status.includes("verifikasi")
+            || ["review", "stale", "unknown"].includes(integrityState(regulation));
+          if (!needsAttention) return false;
+        }
         return true;
       });
 
@@ -494,8 +501,8 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 13h5M9.5 16h5"></path></svg>
           </div>
           <div>
-            <strong>Dokumen PDF resmi</strong>
-            <p>Unduh naskah, abstrak, FAQ, dan lampiran OJK. Teks PDF diindeks untuk pencarian offline.</p>
+            <strong>Dokumen resmi OJK · tekan untuk unduh</strong>
+            <p>Gunakan tombol di bawah untuk mengunduh naskah, abstrak, FAQ, dan lampiran OJK. Setelah tersimpan, tombol “Buka PDF” akan muncul.</p>
             ${hasOfflineIndex(regulation.id) ? `<span class="offline-index-badge">Teks PDF sudah terindeks</span>` : ""}
           </div>
         </div>
@@ -653,7 +660,7 @@
         <article class="checklist-item ${itemState.done ? "completed" : ""}" data-check-item="${escapeHtml(item.id)}">
           <div class="checklist-primary">
             <input type="checkbox" data-check-done="${escapeHtml(item.id)}" ${itemState.done ? "checked" : ""} aria-label="Tandai selesai">
-            <span><small>${escapeHtml(item.group)}</small><strong>${escapeHtml(item.title)}</strong></span>
+            <span><small>${escapeHtml(item.group)}</small><strong>${escapeHtml(item.title)}</strong>${item.basis ? `<em class="checklist-basis">${escapeHtml(item.basis)}</em>` : ""}</span>
             <button class="expand-item" data-expand-item="${escapeHtml(item.id)}" aria-label="Detail">${expanded ? "−" : "+"}</button>
           </div>
           <div class="checklist-fields" ${expanded ? "" : "hidden"}>
@@ -732,6 +739,7 @@
   }
 
   function runSearch(query, save = false) {
+    state.attentionOnly = false;
     setView("library");
     elements.input.value = query;
     elements.input.dispatchEvent(new Event("input"));
@@ -839,6 +847,7 @@
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
+    state.attentionOnly = false;
     renderFilters();
     renderLibrary();
   });
@@ -854,6 +863,7 @@
     state.categories.clear();
     state.statuses.clear();
     state.integrityStates.clear();
+    state.attentionOnly = false;
     state.offlineMatches.clear();
     previousQuery = "";
     elements.input.parentElement.classList.remove("has-value");
@@ -967,6 +977,24 @@
     } else if (!elements.sheet.hidden) {
       closeDetail(false);
     }
+  });
+
+  function applyDashboardShortcut(kind) {
+    state.query = "";
+    state.categories.clear();
+    state.statuses.clear();
+    state.integrityStates.clear();
+    state.attentionOnly = kind === "attention";
+    if (kind === "upcoming") state.statuses.add("Akan berlaku");
+    state.view = "library";
+    switchView("library");
+    renderFilters();
+    renderLibrary();
+    window.scrollTo({ top: document.querySelector(".library").offsetTop - 64, behavior: "smooth" });
+  }
+
+  $(".trust-shortcut").forEach((button) => {
+    button.addEventListener("click", () => applyDashboardShortcut(button.dataset.shortcut));
   });
 
   $("#indexedCount").textContent = String(REGULATIONS.length);

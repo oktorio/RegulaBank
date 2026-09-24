@@ -7,7 +7,7 @@
     <meta name="color-scheme" content="light">
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src https://ojk.go.id https://www.ojk.go.id; object-src 'none'; base-uri 'none'; form-action 'none'">
-    <title>RegulaBank V1.2.1</title>
+    <title>RegulaBank V1.3</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="v1.css">
 </head>
@@ -21,7 +21,7 @@
                 <strong>RegulaBank</strong>
                 <span>Asisten ketentuan perbankan</span>
             </div>
-            <span class="version-chip">V1.2.1</span>
+            <span class="version-chip">V1.3</span>
             <button class="icon-button" id="aboutButton" aria-label="Informasi aplikasi">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="12" r="9"></circle>
@@ -64,10 +64,10 @@
                     </div>
                 </div>
 
-                <div class="trust-strip">
-                    <div><strong id="indexedCount">11</strong><span>Ketentuan terindeks</span></div>
-                    <div><strong id="upcomingCount">1</strong><span>Akan berlaku</span></div>
-                    <div><strong id="attentionCount">3</strong><span>Perlu perhatian</span></div>
+                <div class="trust-strip" aria-label="Shortcut ketentuan">
+                    <button class="trust-shortcut" data-shortcut="indexed"><strong id="indexedCount">13</strong><span>Ketentuan terindeks</span><small>Lihat semua →</small></button>
+                    <button class="trust-shortcut" data-shortcut="upcoming"><strong id="upcomingCount">1</strong><span>Akan berlaku</span><small>Filter →</small></button>
+                    <button class="trust-shortcut" data-shortcut="attention"><strong id="attentionCount">3</strong><span>Perlu perhatian</span><small>Filter →</small></button>
                 </div>
 
                 <section class="library">

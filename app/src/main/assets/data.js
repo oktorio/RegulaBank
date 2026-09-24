@@ -126,6 +126,34 @@ const REGULATIONS = [
     source: "https://www.ojk.go.id/id/regulasi/Pages/Bank-Umum-Syariah.aspx"
   },
   {
+    id: "pojk-21-2023",
+    number: "21 Tahun 2023",
+    type: "POJK",
+    title: "Layanan Digital oleh Bank Umum",
+    category: "Bank Umum",
+    status: "Berlaku",
+    issued: "2023-12-22",
+    effective: "22 Desember 2023",
+    topics: ["layanan digital", "perizinan", "mitra bank", "pelindungan data", "pelaporan"],
+    summary: "Mengatur cakupan, persyaratan, perizinan dan pelaporan Layanan Digital oleh Bank Umum, termasuk kerja sama dengan mitra, pemanfaatan TI, pelindungan nasabah, dan pelindungan data pribadi.",
+    content: "Layanan Digital merupakan Produk Bank berbasis pemanfaatan teknologi informasi melalui media elektronik. Bank harus memiliki infrastruktur TI dan pengelolaan infrastruktur TI yang memadai. Ketentuan mencakup permohonan izin, laporan realisasi dan evaluasi, kerja sama dengan mitra, identifikasi dan verifikasi nasabah, consent pemrosesan data pribadi, serta pengelolaan hak akses mitra. Lampiran POJK memuat format dan persyaratan terkait perizinan dan pelaporan yang perlu digunakan bersama naskah utama.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Layanan-Digital-oleh-Bank-Umum.aspx"
+  },
+  {
+    id: "pojk-13-2021",
+    number: "13/POJK.03/2021",
+    type: "POJK",
+    title: "Penyelenggaraan Produk Bank Umum",
+    category: "Bank Umum",
+    status: "Berlaku",
+    issued: "2021-08-18",
+    effective: "24 Agustus 2021",
+    topics: ["produk bank", "produk dasar", "produk lanjutan", "RPPB", "perizinan produk"],
+    summary: "Mengatur penyelenggaraan Produk Bank Umum dengan pendekatan berbasis risiko, termasuk klasifikasi Produk Bank Dasar dan Lanjutan, Rencana Penyelenggaraan Produk Bank, mekanisme perizinan, serta manajemen risiko dan pelindungan nasabah.",
+    content: "Produk Bank dikelompokkan menjadi Produk Bank Dasar dan Produk Bank Lanjutan. Produk lanjutan antara lain dapat berbasis TI, terkait produk atau kegiatan LJK selain bank, memerlukan persetujuan otoritas lain, atau bersifat kompleks. Bank mencantumkan rencana Produk Bank baru dalam RPPB dan mengikuti mekanisme perizinan atau pelaporan yang relevan. Lampiran POJK menetapkan daftar Produk Bank Dasar yang menjadi acuan klasifikasi.",
+    source: "https://www.ojk.go.id/id/regulasi/Pages/Penyelenggaraan-Produk-Bank-Umum.aspx"
+  },
+  {
     id: "pojk-12-2021",
     number: "12/POJK.03/2021",
     type: "POJK",
