@@ -853,6 +853,7 @@
     state.query = "";
     state.categories.clear();
     state.statuses.clear();
+    state.integrityStates.clear();
     state.offlineMatches.clear();
     previousQuery = "";
     elements.input.parentElement.classList.remove("has-value");
@@ -971,7 +972,9 @@
   $("#indexedCount").textContent = String(REGULATIONS.length);
   $("#upcomingCount").textContent = String(REGULATIONS.filter((item) => item.status === "Akan berlaku").length);
   $("#attentionCount").textContent = String(REGULATIONS.filter((item) =>
-    item.status.includes("dicabut") || item.status.includes("verifikasi")
+    item.status.includes("dicabut") ||
+    item.status.includes("verifikasi") ||
+    ["review", "stale", "unknown"].includes(integrityState(item))
   ).length);
 
   renderFilters();
