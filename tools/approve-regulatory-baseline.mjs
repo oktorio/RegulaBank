@@ -32,6 +32,10 @@ const baselines = await loadBaselines();
 const { regulations } = await loadRegulatoryData();
 const reportPath = path.resolve(ROOT, reportArg);
 const report = JSON.parse(await fs.readFile(reportPath, "utf8"));
+if (report.schemaVersion !== 3) {
+  console.error("Evidence report schemaVersion 3 is required for baseline approval.");
+  process.exit(1);
+}
 
 const generatedAt = new Date(report.generatedAt || "");
 if (Number.isNaN(generatedAt.getTime())) {
@@ -57,6 +61,9 @@ for (const id of selectedIds) {
   if (!/^[a-f0-9]{64}$/.test(String(check.contentFingerprint || ""))) {
     throw new Error(`Invalid SHA-256 content fingerprint for: ${id}`);
   }
+  if (check.fingerprintMethod !== "visible-text-sha256-v1") {
+    throw new Error(`Unsupported fingerprint method for: ${id}`);
+  }
   if (!isAllowedAuthorityUrl(check.finalUrl || "", policy)) {
     throw new Error(`Monitoring evidence ended outside the allowed OJK authority for: ${id}`);
   }
@@ -67,6 +74,7 @@ for (const id of selectedIds) {
   baselines.records[id] = {
     sourceUrl: regulation.source,
     fingerprint: check.contentFingerprint,
+    fingerprintMethod: check.fingerprintMethod,
     approvedAt,
     approvedBy,
     evidenceGeneratedAt: report.generatedAt
