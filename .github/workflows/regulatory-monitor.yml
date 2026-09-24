@@ -7,6 +7,7 @@ on:
       - "app/src/main/assets/data.js"
       - "app/src/main/assets/v1-data.js"
       - "config/regulatory-integrity.json"
+      - "config/regulatory-baselines.json"
       - "tools/**"
       - ".github/workflows/regulatory-monitor.yml"
   pull_request:
@@ -15,6 +16,7 @@ on:
       - "app/src/main/assets/data.js"
       - "app/src/main/assets/v1-data.js"
       - "config/regulatory-integrity.json"
+      - "config/regulatory-baselines.json"
       - "tools/**"
       - ".github/workflows/regulatory-monitor.yml"
   schedule:
@@ -36,6 +38,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check app/src/main/assets/app.js
+          node --check app/src/main/assets/data.js
+          node --check app/src/main/assets/v1-data.js
+          node --check tools/load-regulatory-data.mjs
+          node --check tools/validate-regulatory-data.mjs
+          node --check tools/check-ojk-regulatory-feed.mjs
+          node --check tools/approve-regulatory-baseline.mjs
 
       - name: Validate curated regulatory data
         run: node tools/validate-regulatory-data.mjs
