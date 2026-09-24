@@ -660,13 +660,14 @@
         <article class="checklist-item ${itemState.done ? "completed" : ""}" data-check-item="${escapeHtml(item.id)}">
           <div class="checklist-primary">
             <input type="checkbox" data-check-done="${escapeHtml(item.id)}" ${itemState.done ? "checked" : ""} aria-label="Tandai selesai">
-            <span><small>${escapeHtml(item.group)}</small><strong>${escapeHtml(item.title)}</strong>${item.basis ? `<em class="checklist-basis">${escapeHtml(item.basis)}</em>` : ""}</span>
+            <span><small>${escapeHtml(item.group)}</small><strong>${escapeHtml(item.title)}</strong>${item.basis ? `<em class="checklist-basis">${escapeHtml(item.basis)}</em>` : ""}${item.ref ? `<em class="checklist-ref">${escapeHtml(item.ref)}</em>` : ""}</span>
             <button class="expand-item" data-expand-item="${escapeHtml(item.id)}" aria-label="Detail">${expanded ? "−" : "+"}</button>
           </div>
           <div class="checklist-fields" ${expanded ? "" : "hidden"}>
             <label>PIC<input data-check-field="pic" data-item-id="${escapeHtml(item.id)}" value="${escapeHtml(itemState.pic)}" placeholder="Nama/unit"></label>
             <label>Target internal<input type="date" data-check-field="due" data-item-id="${escapeHtml(item.id)}" value="${escapeHtml(itemState.due)}"></label>
             <label>Bukti / catatan<textarea data-check-field="evidence" data-item-id="${escapeHtml(item.id)}" rows="2" placeholder="Nama dokumen, tautan, atau catatan">${escapeHtml(itemState.evidence)}</textarea></label>
+            ${item.appendix ? `<button type="button" class="appendix-action" data-open-appendix="${escapeHtml(item.id)}">Buka rujukan lampiran</button>` : ""}
           </div>
         </article>`;
     }).join("");
@@ -684,6 +685,13 @@
         if (state.expandedItems.has(key)) state.expandedItems.delete(key);
         else state.expandedItems.add(key);
         renderChecklist();
+      });
+    });
+    $("#checklistList").querySelectorAll("[data-open-appendix]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const item = template.items.find((entry) => entry.id === button.dataset.openAppendix);
+        openDetail(template.regulationId);
+        if (item?.appendix) showToast(`${item.appendix}${item.ref ? " · " + item.ref : ""} — gunakan tombol Dokumen resmi OJK untuk membuka/unduh naskah dan lampiran.`);
       });
     });
     $("#checklistList").querySelectorAll("[data-check-field]").forEach((input) => {
@@ -987,7 +995,7 @@
     state.attentionOnly = kind === "attention";
     if (kind === "upcoming") state.statuses.add("Akan berlaku");
     state.view = "library";
-    switchView("library");
+    setView("library");
     renderFilters();
     renderLibrary();
     window.scrollTo({ top: document.querySelector(".library").offsetTop - 64, behavior: "smooth" });
