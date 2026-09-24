@@ -1104,3 +1104,25 @@ body.sheet-open {
 .trust-shortcut small { display:block; margin-top:5px; color:var(--green-700); font-size:8px; font-weight:700; }
 .trust-shortcut:active { background:var(--green-50); }
 .checklist-basis { display:block; margin-top:4px; color:var(--green-700); font-size:9px; font-style:normal; font-weight:600; line-height:1.4; }
+
+/* V1.3.1 Merah Putih Batik */
+:root{
+  --green-900:#4d0710;--green-800:#68101a;--green-700:#8f1724;--green-600:#a91e2d;
+  --green-100:#f8e8e9;--green-50:#fff5f5;--gold:#b98a45;--gold-soft:#f3d8aa;
+  --paper:#fffaf7;--line:#ead9d5;--danger:#b21725;
+}
+.topbar{background:linear-gradient(135deg,#6f0d18 0%,#a71928 58%,#7a0f1b 100%);position:relative;overflow:hidden}
+.topbar::after,.hero::after,.page-intro::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.13;background-image:repeating-radial-gradient(circle at 0 0,transparent 0 8px,rgba(255,255,255,.8) 9px 10px,transparent 11px 18px),repeating-linear-gradient(45deg,transparent 0 16px,rgba(255,255,255,.35) 17px 18px,transparent 19px 32px)}
+.topbar>*{position:relative;z-index:1}.brand-mark{border-color:rgba(255,235,215,.55);background:rgba(255,255,255,.08)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(145deg,#8f1724 0%,#b82131 48%,#7d101c 100%)}
+.hero>*{position:relative;z-index:1}.hero .eyebrow,.hero h1,.hero p{color:#fff}.hero h1 em{color:#f7d9a8}
+.search-card{box-shadow:0 12px 30px rgba(88,8,18,.18)}.quick-searches button{border-color:rgba(255,255,255,.32);color:#fff;background:rgba(255,255,255,.07)}
+.trust-shortcut strong,.card-number,.text-action,.related-button span,.offline-search-state{color:var(--green-700)}
+.trust-shortcut:active{background:#fff1f1}.regulation-card::before,.alert-card::before{background:var(--green-700)}
+.bottom-nav .nav-item.active,.v1-nav .nav-item.active{color:var(--green-700)}
+.progress-ring{background:conic-gradient(var(--green-700) var(--progress),#f3d8d8 0)}
+.checklist-item{border-color:#ead6d2}.checklist-primary small{color:#b17b35}
+.checklist-basis{color:var(--green-700)}.checklist-ref{display:block;margin-top:3px;color:#806d67;font-size:8px;font-style:normal;line-height:1.45}
+.appendix-action{grid-column:1/-1;justify-self:start;padding:7px 10px;border:1px solid #e3c6c2;border-radius:9px;color:var(--green-700);background:#fff6f4;font-size:8px;font-weight:800}
+.workspace-view,.saved-view,.about-view{background:linear-gradient(180deg,#fffdfa 0%,#fff7f5 100%)}
+.page-intro{position:relative;overflow:hidden}.page-intro>*{position:relative;z-index:1}
