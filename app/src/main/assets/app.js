@@ -1021,20 +1021,17 @@
     if (library) library.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  $(".trust-shortcut").forEach((button) => {
-    const activate = (event) => {
+  // Dashboard shortcuts: use event delegation so dynamically rendered / WebView
+  // button targets are handled reliably without depending on per-node binding.
+  const trustStrip = document.querySelector(".trust-strip");
+  if (trustStrip) {
+    trustStrip.addEventListener("click", (event) => {
+      const button = event.target.closest(".trust-shortcut");
+      if (!button || !trustStrip.contains(button)) return;
       event.preventDefault();
-      event.stopPropagation();
       applyDashboardShortcut(button.dataset.shortcut);
-    };
-    button.addEventListener("click", activate);
-    button.addEventListener("touchend", activate, { passive: false });
-    button.setAttribute("role", "button");
-    button.setAttribute("tabindex", "0");
-    button.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") activate(event);
     });
-  });
+  }
 
   $("#indexedCount").textContent = String(REGULATIONS.length);
   $("#upcomingCount").textContent = String(REGULATIONS.filter((item) => item.status === "Akan berlaku").length);
