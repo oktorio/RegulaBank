@@ -1,5 +1,70 @@
 const REGULATIONS = [
   {
+    id: "seojk-33-2025", number: "33/SEOJK.03/2025", type: "SEOJK",
+    title: "Pelaporan Bank Umum Syariah dan Unit Usaha Syariah melalui Sistem Pelaporan Otoritas Jasa Keuangan",
+    category: "Syariah", status: "Berlaku", issued: "2025-11-28", effective: "28 November 2025",
+    parentRegulation: "POJK 22 Tahun 2025", replaces: "SEOJK 27/SEOJK.03/2020",
+    topics: ["pelaporan", "APOLO", "BUS", "UUS", "laporan berkala", "laporan insidental"],
+    summary: "Pedoman pelaporan BUS, UUS, dan KPBLN syariah melalui Sistem Pelaporan OJK/APOLO.",
+    content: "Menetapkan jenis laporan berkala dan insidental, posisi data, periodisasi, batas waktu, pelaporan pertama kali, dan pedoman penyusunan laporan BUS, UUS, dan KPBLN syariah. Mencabut SEOJK 27/SEOJK.03/2020.",
+    source: "https://ojk.go.id/id/regulasi/Pages/33-SEOJK03-2025-Pelaporan-BUS-dan-UUS-melalui-Sistem-Pelaporan-OJK.aspx"
+  },
+  {
+    id: "seojk-23-2022", number: "23/SEOJK.03/2022", type: "SEOJK",
+    title: "Perhitungan Aset Tertimbang Menurut Risiko untuk Risiko Pasar bagi Bank Umum",
+    category: "Bank Umum", status: "Berlaku", issued: "2022-12-07", effective: "7 Desember 2022",
+    topics: ["ATMR", "risiko pasar", "permodalan", "bank umum"],
+    summary: "Pedoman perhitungan ATMR untuk risiko pasar bagi Bank Umum.",
+    content: "Mengatur perhitungan Aset Tertimbang Menurut Risiko untuk Risiko Pasar bagi Bank Umum sebagai bagian dari kerangka permodalan dan manajemen risiko prudensial.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Perhitungan-Aset-Tertimbang-Menurut-Risiko-untuk-Risiko-Pasar-Bagi-Bank-Umum.aspx"
+  },
+  {
+    id: "seojk-6-2023", number: "6/SEOJK.03/2023", type: "SEOJK",
+    title: "Perubahan Kegiatan Usaha Bank Umum Konvensional Menjadi Bank Umum Syariah",
+    category: "Syariah", status: "Berlaku", issued: "2023-02-21", effective: "21 Februari 2023",
+    topics: ["konversi bank", "BUK", "BUS", "perizinan", "syariah"],
+    summary: "Ketentuan pelaksanaan perubahan kegiatan usaha Bank Umum Konvensional menjadi Bank Umum Syariah.",
+    content: "Mengatur pelaksanaan perubahan kegiatan usaha Bank Umum Konvensional menjadi Bank Umum Syariah, termasuk aspek perizinan dan proses konversi.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Perubahan-Kegiatan-Usaha-Bank-Umum-Konvensional-Menjadi-Bank-Umum-Syariah.aspx"
+  },
+  {
+    id: "seojk-7-2023", number: "7/SEOJK.03/2023", type: "SEOJK",
+    title: "Perubahan Kegiatan Usaha Bank Perekonomian Rakyat Menjadi Bank Perekonomian Rakyat Syariah",
+    category: "BPR/BPRS", status: "Berlaku", issued: "2023-02-21", effective: "21 Februari 2023",
+    topics: ["konversi bank", "BPR", "BPRS", "perizinan", "syariah"],
+    summary: "Ketentuan pelaksanaan perubahan kegiatan usaha BPR menjadi BPR Syariah.",
+    content: "Mengatur pelaksanaan perubahan kegiatan usaha Bank Perekonomian Rakyat menjadi Bank Perekonomian Rakyat Syariah.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Perubahan-Kegiatan-Usaha-Bank-Perekonomian-Rakyat-Menjadi-Bank-Perekonomian-Rakyat-Syariah.aspx"
+  },
+  {
+    id: "seojk-12-2018", number: "12/SEOJK.03/2018", type: "SEOJK",
+    title: "Penerapan Manajemen Risiko dan Pengukuran Risiko Pendekatan Standar untuk Risiko Suku Bunga dalam Banking Book bagi Bank Umum",
+    category: "Bank Umum", status: "Berlaku", issued: "2018-08-21", effective: "27 Agustus 2018",
+    topics: ["IRRBB", "risiko suku bunga", "banking book", "manajemen risiko"],
+    summary: "Pedoman penerapan manajemen risiko dan pengukuran standar untuk risiko suku bunga dalam banking book (IRRBB).",
+    content: "Mengatur penerapan manajemen risiko serta pengukuran risiko dengan pendekatan standar untuk risiko suku bunga dalam banking book bagi Bank Umum.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Penerapan-Manajemen-Risiko-Pengukuran-Risiko-Pendekatan-Standar-untuk-Risiko-Suku-Bunga-dalam-Banking-Book-bagi-Bank-Umum.aspx"
+  },
+  {
+    id: "seojk-11-2018", number: "11/SEOJK.03/2018", type: "SEOJK",
+    title: "Perubahan atas Pedoman Perhitungan Aset Tertimbang Menurut Risiko untuk Risiko Kredit dengan Pendekatan Standar",
+    category: "Bank Umum", status: "Perlu verifikasi status", issued: "2018-08-15", effective: "21 Agustus 2018",
+    topics: ["ATMR", "risiko kredit", "pendekatan standar", "permodalan"],
+    summary: "Perubahan pedoman perhitungan ATMR risiko kredit dengan pendekatan standar bagi Bank Umum.",
+    content: "Mengubah pedoman perhitungan Aset Tertimbang Menurut Risiko untuk risiko kredit dengan pendekatan standar. Status keberlakuan terhadap ketentuan prudensial yang lebih baru perlu diverifikasi sebelum digunakan sebagai dasar final.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Perubahan-SEOJK-tentang-Pedoman-Perhitungan-Aset-Tertimbang-menurut-Risiko-untuk-RIsiko-Kredit-dengan-Pendekatan-Standar.aspx"
+  },
+  {
+    id: "seojk-13-2018", number: "13/SEOJK.03/2018", type: "SEOJK",
+    title: "Perubahan SEOJK Perhitungan ATMR Risiko Kredit dengan Pendekatan Standar bagi Bank Umum Syariah",
+    category: "Syariah", status: "Perlu verifikasi status", issued: "2018-09-20", effective: "24 September 2018",
+    topics: ["ATMR", "risiko kredit", "BUS", "UUS", "permodalan"],
+    summary: "Perubahan ketentuan perhitungan ATMR risiko kredit dengan pendekatan standar bagi perbankan syariah.",
+    content: "Mengubah pedoman perhitungan Aset Tertimbang Menurut Risiko untuk risiko kredit dengan pendekatan standar bagi Bank Umum Syariah. Status keberlakuan terhadap ketentuan prudensial yang lebih baru perlu diverifikasi sebelum digunakan sebagai dasar final.",
+    source: "https://ojk.go.id/id/regulasi/Pages/Perubahan-SEOJK-Perhitungan-Aset-Tertimbang-Menurut-Risiko-utk-Risiko-Kredit-dg-Pendekatan-Standar-bagi-Bank-Umum-Syariah.aspx"
+  },
+
+  {
     id: "seojk-31-2025",
     number: "31/SEOJK.03/2025",
     type: "SEOJK",
