@@ -259,7 +259,7 @@
           </div>
           <div class="verification-row">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
-            <span>${escapeHtml(regulation.verification)} · dicek ${escapeHtml(regulation.verifiedAt)}</span>
+            <span>${escapeHtml(regulation.verification)}${regulation.verifiedAt ? ` · dicek ${escapeHtml(regulation.verifiedAt)}` : ""}</span>
           </div>
         </div>
       </article>`;
@@ -465,7 +465,7 @@
       </div>
       <div class="verification-card">
         <div><span>Verifikasi manusia</span><strong>${escapeHtml(regulation.verification)}</strong></div>
-        <div><span>Terakhir diperiksa</span><strong>${escapeHtml(regulation.verifiedAt)}</strong></div>
+        <div><span>Terakhir diperiksa</span><strong>${escapeHtml(regulation.verifiedAt || "Belum diverifikasi")}</strong></div>
         <div><span>Freshness</span><strong class="integrity-text integrity-${escapeHtml(integrityState(regulation))}">${escapeHtml(integrityLabel(regulation))}</strong></div>
         <div><span>Usia verifikasi</span><strong>${escapeHtml(integrityAgeLabel(regulation))}</strong></div>
       </div>

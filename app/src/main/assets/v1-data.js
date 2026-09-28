@@ -118,6 +118,30 @@ const V1_REGULATION_METADATA = {
   }
 };
 
+// New SEOJK index entries remain unverified until a reviewer checks the
+// authoritative text, legal status, effective date, and relationships.
+const UNVERIFIED_SEOJK_IDS = [
+  "seojk-32-2025", "seojk-27-2025", "seojk-15-2025", "seojk-8-2025",
+  "seojk-2-2025", "seojk-16-2024", "seojk-18-2023", "seojk-10-2023",
+  "seojk-3-2023", "seojk-12-2022", "seojk-11-2022", "seojk-8-2022",
+  "seojk-33-2025", "seojk-23-2022", "seojk-6-2023", "seojk-7-2023",
+  "seojk-12-2018", "seojk-11-2018", "seojk-13-2018", "seojk-31-2025",
+  "seojk-29-2025", "seojk-14-2025", "seojk-15-2024", "seojk-25-2023",
+  "seojk-24-2023", "seojk-29-2022"
+];
+
+for (const id of UNVERIFIED_SEOJK_IDS) {
+  V1_REGULATION_METADATA[id] = {
+    verifiedOn: "",
+    verifiedAt: "",
+    verification: "Belum diverifikasi terhadap naskah resmi OJK",
+    aliases: [],
+    changeSummary: "Status, tanggal berlaku, dan hubungan dengan ketentuan lain perlu diverifikasi pada naskah resmi OJK.",
+    deadlines: ["Verifikasi naskah resmi dan lampiran sebelum menggunakan ringkasan ini untuk keputusan."],
+    relatedIds: []
+  };
+}
+
 const REGULATORY_FRESHNESS_POLICY = Object.freeze({
   reviewAfterDays: 45,
   staleAfterDays: 90
@@ -138,7 +162,7 @@ function calculateFreshness(verifiedOnValue, verifiedAt) {
   const verifiedOn = /^\d{4}-\d{2}-\d{2}$/.test(String(verifiedOnValue || ""))
     ? String(verifiedOnValue)
     : verifiedDateToIso(verifiedAt);
-  if (!verifiedOn) return { verifiedOn: "", ageDays: null, state: "unknown", label: "tanggal verifikasi tidak dikenali" };
+  if (!verifiedOn) return { verifiedOn: "", ageDays: null, state: "unknown", label: "belum diverifikasi" };
   const verifiedTime = new Date(`${verifiedOn}T00:00:00Z`).getTime();
   const ageDays = Math.max(0, Math.floor((Date.now() - verifiedTime) / 86400000));
   if (ageDays > REGULATORY_FRESHNESS_POLICY.staleAfterDays) {
@@ -152,9 +176,9 @@ function calculateFreshness(verifiedOnValue, verifiedAt) {
 
 REGULATIONS.forEach((regulation) => {
   Object.assign(regulation, {
-    verifiedOn: "2026-07-30",
-    verifiedAt: "30 Juli 2026",
-    verification: "Kurasi internal",
+    verifiedOn: "",
+    verifiedAt: "",
+    verification: "Belum diverifikasi terhadap naskah resmi OJK",
     aliases: [],
     changeSummary: "Belum ada ringkasan perubahan yang terverifikasi.",
     deadlines: ["Verifikasi tanggal dan kewajiban pada naskah resmi OJK"],
@@ -167,7 +191,7 @@ REGULATIONS.forEach((regulation) => {
     authority: "Otoritas Jasa Keuangan",
     sourceType: "official-regulation-page",
     sourceUrl: regulation.source,
-    verificationMethod: "human-curated",
+    verificationMethod: freshness.verifiedOn ? "human-curated" : "unverified",
     interpretationLayer: "RegulaBank editorial summary"
   };
 });

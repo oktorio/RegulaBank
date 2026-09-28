@@ -78,32 +78,42 @@ for (const regulation of regulations) {
     error(scope, "Missing V1_REGULATION_METADATA entry.");
     continue;
   }
-  for (const field of ["verifiedOn", "verifiedAt", "verification", "changeSummary"]) {
+  for (const field of ["verification", "changeSummary"]) {
     if (typeof record[field] !== "string" || !record[field].trim()) error(scope, `Metadata ${field} is required.`);
   }
   for (const field of ["aliases", "deadlines", "relatedIds"]) {
     if (!Array.isArray(record[field])) error(scope, `Metadata ${field} must be an array.`);
   }
 
-  if (!isIsoDate(record.verifiedOn)) {
-    error(scope, `verifiedOn must be a real ISO YYYY-MM-DD date: ${record.verifiedOn}`);
-  }
-
-  const displayVerified = parseIndonesianDate(record.verifiedAt);
-  if (!displayVerified) {
-    error(scope, `verifiedAt is not a supported Indonesian date: ${record.verifiedAt}`);
-  } else {
-    if (isIsoDate(record.verifiedOn) && isoFromDate(displayVerified) !== record.verifiedOn) {
-      error(scope, `verifiedOn (${record.verifiedOn}) does not match verifiedAt (${record.verifiedAt}).`);
+  const unverified = record.verifiedOn === "" && record.verifiedAt === "";
+  if (unverified) {
+    if (record.verification !== "Belum diverifikasi terhadap naskah resmi OJK") {
+      error(scope, "Unverified entries must carry the explicit unverified label.");
     }
-    const canonicalVerified = isIsoDate(record.verifiedOn)
-      ? new Date(`${record.verifiedOn}T00:00:00Z`)
-      : displayVerified;
-    const age = daysBetween(canonicalVerified);
-    if (age > policy.freshness.staleAfterDays) {
-      warn(scope, `Verification is stale (${age} days; threshold ${policy.freshness.staleAfterDays}).`);
-    } else if (age > policy.freshness.reviewAfterDays) {
-      warn(scope, `Verification review is due (${age} days; review threshold ${policy.freshness.reviewAfterDays}).`);
+    if (regulation.status !== "Perlu verifikasi") {
+      error(scope, "Unverified entries must use the Perlu verifikasi status.");
+    }
+    warn(scope, "Authoritative regulation text still requires human verification.");
+  } else {
+    if (!isIsoDate(record.verifiedOn)) {
+      error(scope, `verifiedOn must be a real ISO YYYY-MM-DD date: ${record.verifiedOn}`);
+    }
+    const displayVerified = parseIndonesianDate(record.verifiedAt);
+    if (!displayVerified) {
+      error(scope, `verifiedAt is not a supported Indonesian date: ${record.verifiedAt}`);
+    } else {
+      if (isIsoDate(record.verifiedOn) && isoFromDate(displayVerified) !== record.verifiedOn) {
+        error(scope, `verifiedOn (${record.verifiedOn}) does not match verifiedAt (${record.verifiedAt}).`);
+      }
+      const canonicalVerified = isIsoDate(record.verifiedOn)
+        ? new Date(`${record.verifiedOn}T00:00:00Z`)
+        : displayVerified;
+      const age = daysBetween(canonicalVerified);
+      if (age > policy.freshness.staleAfterDays) {
+        warn(scope, `Verification is stale (${age} days; threshold ${policy.freshness.staleAfterDays}).`);
+      } else if (age > policy.freshness.reviewAfterDays) {
+        warn(scope, `Verification review is due (${age} days; review threshold ${policy.freshness.reviewAfterDays}).`);
+      }
     }
   }
 
@@ -114,8 +124,13 @@ for (const regulation of regulations) {
     if (!allowedFreshnessStates.has(integrity.state)) error(scope, `Unsupported freshness state: ${integrity.state}`);
     if (integrity.authority !== policy.authority) error(scope, `Integrity authority must be ${policy.authority}.`);
     if (integrity.sourceUrl !== regulation.source) error(scope, "Integrity sourceUrl must match the regulation source.");
-    if (integrity.verificationMethod !== "human-curated") error(scope, "verificationMethod must preserve the human-curated boundary.");
+    if (integrity.verificationMethod !== (unverified ? "unverified" : "human-curated")) {
+      error(scope, "verificationMethod must match the human verification state.");
+    }
     if (integrity.verifiedOn !== record.verifiedOn) error(scope, "Runtime integrity.verifiedOn must match metadata verifiedOn.");
+    if (unverified && (integrity.state !== "unknown" || integrity.ageDays !== null)) {
+      error(scope, "Unverified entries must have unknown freshness and no verification age.");
+    }
   }
 }
 
