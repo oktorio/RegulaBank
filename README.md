@@ -177,6 +177,6 @@ Bookmarks, notes, checklists, downloaded PDFs, and generated PDF search indexes 
 
 ## Version
 
-Current version: **V1.3.10 Navigation and SEOJK Review** (`1.3.10`).
+Current version: **V1.3.11 Completed SEOJK Legal Status Review** (`1.3.11`).
 
-V1.3.10 records a source-by-source date review for 26 SEOJK and improves Android Back navigation, dashboard filters, detail links, and keyboard access. Legal-status review remains pending where no subsequent OJK instrument has been traced. See [SEOJK review](docs/seojk-source-review-2026-09-28.md).
+V1.3.11 completes the source-by-source legal-status review for all 26 indexed SEOJK. The catalog now records 22 as Berlaku, 3 as Dicabut, and 1 as Sebagian dicabut, with verification evidence and review date stored in metadata. It retains the navigation and accessibility improvements introduced in V1.3.10. See [SEOJK review](docs/seojk-source-review-2026-09-28.md).
