@@ -168,6 +168,191 @@ Object.assign(V1_REGULATION_METADATA["seojk-23-2022"], {
   sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/29-SEOJK03-2025-Transparansi-dan-Publikasi-Laporan-Bank-Umum-Konvensional.aspx"
 });
 
+Object.assign(V1_REGULATION_METADATA["seojk-32-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 9 Februari 2026 dan menggantikan SEOJK 10/SEOJK.03/2020.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://www.ojk.go.id/id/regulasi/Pages/32-SEOJK03-2025-Transparansi-dan-Publikasi-Laporan-BUS-dan-UUS.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-27-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 19 November 2025 dan mencabut SEOJK 37/SEOJK.03/2016.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://www.ojk.go.id/id/regulasi/Pages/SEOJK-27-SEOJK03-2025-Lembaga-Pemeringkat-dan-Peringkat-yang-Diakui-OJK.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-15-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 30 Juni 2025; menjadi pedoman tata kelola BPRS dan menggantikan ketentuan pelaksanaan tata kelola BPRS sebelumnya.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-15-SEOJK03-2025-Penerapan-Tata-Kelola-Bagi-Bank-Perekonomian-Rakyat-Syariah.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-8-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 26 Mei 2025 sebagai ketentuan pelaksanaan fungsi kepatuhan BPR dan BPRS berdasarkan kerangka tata kelola terbaru.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-8-SEOJK03-2025-Penerapan-Fungsi-Kepatuhan-Bagi-BPR-BPRS.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-2-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi kembali oleh ketentuan peralihan POJK 7 Tahun 2026",
+  changeSummary: "Tetap berlaku setelah POJK 7 Tahun 2026 menggantikan POJK 5/POJK.03/2015, sepanjang tidak bertentangan dengan POJK 7 Tahun 2026.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/POJK-Nomor-7-Tahun-2026-Kewajiban-Penyediaan-Modal-Minimum-dan-Pemenuhan-Modal-Inti-Minimum-Bank-Perekonomian-Rakyat.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-16-2024"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 1 Desember 2024; mencabut SEOJK 12/SEOJK.03/2022 dan mempertahankan sejumlah SEOJK BPR sepanjang tidak bertentangan.",
+  relatedIds: ["seojk-12-2022","seojk-8-2022","seojk-11-2022","seojk-18-2023"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-16-SEOJK.03-2024-Pelaporan-Melalui-Sistem-Pelaporan-Otoritas-Jasa-Keuangan-dan-Transparansi-Kondisi-Keuangan-bagi.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-18-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi kembali oleh SEOJK 16/2024 dan SEOJK 17/2024",
+  changeSummary: "Tetap berlaku untuk cakupan terkait sepanjang tidak bertentangan dengan SEOJK 16/2024 dan SEOJK 17/2024; menggantikan SEOJK 36/SEOJK.03/2017.",
+  relatedIds: ["seojk-16-2024"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-16-SEOJK.03-2024-Pelaporan-Melalui-Sistem-Pelaporan-Otoritas-Jasa-Keuangan-dan-Transparansi-Kondisi-Keuangan-bagi.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-10-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi kembali oleh SEOJK 17/SEOJK.03/2024",
+  changeSummary: "Dinyatakan masih tetap berlaku sepanjang tidak bertentangan dengan SEOJK 17/SEOJK.03/2024.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-17-SEOJK03-2024-Pelaporan-Melalui-Sistem-Pelaporan-OJK-dan-Transparansi-Kondisi-Keuangan-bagi-BPRS.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-11-2022"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi kembali oleh SEOJK 16/2024 dan SEOJK 17/2024",
+  changeSummary: "Dinyatakan masih tetap berlaku sepanjang tidak bertentangan dengan SEOJK 16/2024 dan SEOJK 17/2024.",
+  relatedIds: ["seojk-16-2024"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-16-SEOJK.03-2024-Pelaporan-Melalui-Sistem-Pelaporan-Otoritas-Jasa-Keuangan-dan-Transparansi-Kondisi-Keuangan-bagi.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-8-2022"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi kembali oleh SEOJK 16/SEOJK.03/2024",
+  changeSummary: "Dinyatakan masih tetap berlaku sepanjang tidak bertentangan dengan SEOJK 16/SEOJK.03/2024.",
+  relatedIds: ["seojk-16-2024"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-16-SEOJK.03-2024-Pelaporan-Melalui-Sistem-Pelaporan-Otoritas-Jasa-Keuangan-dan-Transparansi-Kondisi-Keuangan-bagi.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-33-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 28 November 2025 dan mencabut SEOJK 27/SEOJK.03/2020.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/33-SEOJK03-2025-Pelaporan-BUS-dan-UUS-melalui-Sistem-Pelaporan-OJK.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-6-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi melalui naskah dan katalog regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 21 Februari 2023 sebagai pedoman konversi BUK menjadi BUS dan mencabut SEOJK 2/SEOJK.03/2017.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Perubahan-Kegiatan-Usaha-Bank-Umum-Konvensional-Menjadi-Bank-Umum-Syariah.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-7-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi melalui naskah dan katalog regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 21 Februari 2023 sebagai pedoman konversi BPR menjadi BPRS dan mencabut SEOJK 3/SEOJK.03/2017.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Perubahan-Kegiatan-Usaha-Bank-Perekonomian-Rakyat-Menjadi-Bank-Perekonomian-Rakyat-Syariah.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-12-2018"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi melalui halaman implementasi Basel dan katalog regulasi resmi OJK",
+  changeSummary: "Masih digunakan OJK sebagai kerangka IRRBB bagi Bank Umum pada halaman implementasi Basel yang aktif.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/kanal/perbankan/implementasi-basel/Pages/International-Financial-Reports.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-11-2018"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Pencabutan dikonfirmasi pada SEOJK 24/SEOJK.03/2021",
+  changeSummary: "SEOJK 42/SEOJK.03/2016 sebagaimana diubah dengan SEOJK 11/SEOJK.03/2018 dicabut dan tidak berlaku ketika SEOJK 24/SEOJK.03/2021 mulai efektif pada 1 Januari 2023.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Perhitungan-Aset-Tertimbang-Menurut-Risiko-Untuk-Risiko-Kredit-Dengan-Menggunakan-Pendekatan-Standar-Bagi-Bank-Umum.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-13-2018"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi melalui katalog regulasi resmi OJK",
+  changeSummary: "Merupakan perubahan atas SEOJK 34/SEOJK.03/2015 untuk ATMR risiko kredit BUS; SEOJK induk tetap tercantum sebagai regulasi OJK.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Perhitungan-Aset-Tertimbang-Menurut-Risiko-untuk-Risiko-Kredit-dengan-Menggunakan-Pendekatan-Standar-bagi-Bank-Umum-Syariah.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-31-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 28 November 2025 sebagai ketentuan pelaksanaan pelaporan BUK dan KPBLN berdasarkan POJK 22 Tahun 2025.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/31-SEOJK03-2025-Pelaporan-Bank-Umum-Konvensional-Melalui-Sistem-Pelaporan-Otoritas-Jasa-Keuangan.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-29-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 9 Februari 2026; mencabut SEOJK 9/2020 dan bagian tertentu beberapa SEOJK prudensial, termasuk sebagian SEOJK 23/2022.",
+  relatedIds: ["seojk-23-2022"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/29-SEOJK03-2025-Transparansi-dan-Publikasi-Laporan-Bank-Umum-Konvensional.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-14-2025"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 24 Juni 2025 sebagai pedoman penerapan tata kelola Bank Umum berdasarkan POJK 17 Tahun 2023 dan POJK 2 Tahun 2024.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-14-SEOJK032025-Penerapan-Tata-Kelola-Bagi-Bank-Umum.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-15-2024"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada halaman regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 26 November 2024 sebagai ketentuan pelaksanaan tata kelola syariah BUS dan UUS berdasarkan POJK 2 Tahun 2024.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-15-SEOJK.03-2024-Penerapan-Tata-Kelola-Syariah-bagi-Bank-Umum-Syariah-dan-Unit-Usaha-Syariah.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-25-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada katalog regulasi resmi OJK",
+  changeSummary: "Berlaku sejak 1 Januari 2024 sebagai pedoman penerapan manajemen risiko bagi BUS dan UUS.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Penerapan-Manajemen-Risiko-Bagi-Bank-Umum-Syariah-dan-Unit-Usaha-Syariah.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-24-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada katalog regulasi dan publikasi OJK tahun 2026",
+  changeSummary: "Masih digunakan sebagai kerangka Penilaian Tingkat Maturitas Digital Bank Umum pada publikasi kebijakan OJK tahun 2026.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Penilaian-Tingkat-Maturitas-Digital-Bank-Umum.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-29-2022"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Keberlakuan dikonfirmasi pada katalog regulasi dan publikasi OJK tahun 2026",
+  changeSummary: "Masih digunakan sebagai kerangka ketahanan dan keamanan siber Bank Umum pada publikasi kebijakan OJK tahun 2026.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/Ketahanan-dan-Keamanan-Siber-Bagi-Bank-Umum.aspx"
+});
+
 const REGULATORY_FRESHNESS_POLICY = Object.freeze({
   reviewAfterDays: 45,
   staleAfterDays: 90
