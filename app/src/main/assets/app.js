@@ -274,8 +274,8 @@
         if (state.statuses.size && !state.statuses.has(regulation.status)) return false;
         if (state.integrityStates.size && !state.integrityStates.has(integrityState(regulation))) return false;
         if (state.attentionOnly) {
-          const needsAttention = regulation.status.includes("dicabut")
-            || regulation.status.includes("verifikasi")
+          const needsAttention = normalize(regulation.status).includes("dicabut")
+            || normalize(regulation.status).includes("verifikasi")
             || ["review", "stale", "unknown"].includes(integrityState(regulation));
           if (!needsAttention) return false;
         }
@@ -466,6 +466,7 @@
       <div class="verification-card">
         <div><span>Verifikasi manusia</span><strong>${escapeHtml(regulation.verification)}</strong></div>
         <div><span>Terakhir diperiksa</span><strong>${escapeHtml(regulation.verifiedAt || "Belum diverifikasi")}</strong></div>
+        ${regulation.sourceCheckedOn ? `<div><span>Data pada sumber OJK dicocokkan</span><strong>${formatDate(regulation.sourceCheckedOn)}</strong></div>` : ""}
         <div><span>Freshness</span><strong class="integrity-text integrity-${escapeHtml(integrityState(regulation))}">${escapeHtml(integrityLabel(regulation))}</strong></div>
         <div><span>Usia verifikasi</span><strong>${escapeHtml(integrityAgeLabel(regulation))}</strong></div>
       </div>
@@ -1036,8 +1037,8 @@
   $("#indexedCount").textContent = String(REGULATIONS.length);
   $("#upcomingCount").textContent = String(REGULATIONS.filter((item) => item.status === "Akan berlaku").length);
   $("#attentionCount").textContent = String(REGULATIONS.filter((item) =>
-    item.status.includes("dicabut") ||
-    item.status.includes("verifikasi") ||
+    normalize(item.status).includes("dicabut") ||
+    normalize(item.status).includes("verifikasi") ||
     ["review", "stale", "unknown"].includes(integrityState(item))
   ).length);
 

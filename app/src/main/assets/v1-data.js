@@ -118,9 +118,9 @@ const V1_REGULATION_METADATA = {
   }
 };
 
-// New SEOJK index entries remain unverified until a reviewer checks the
-// authoritative text, legal status, effective date, and relationships.
-const UNVERIFIED_SEOJK_IDS = [
+// Indexed SEOJK entries reviewed individually against the OJK source pages.
+// A source date check alone does not establish current legal status.
+const SEOJK_SOURCE_REVIEW_IDS = [
   "seojk-32-2025", "seojk-27-2025", "seojk-15-2025", "seojk-8-2025",
   "seojk-2-2025", "seojk-16-2024", "seojk-18-2023", "seojk-10-2023",
   "seojk-3-2023", "seojk-12-2022", "seojk-11-2022", "seojk-8-2022",
@@ -130,17 +130,43 @@ const UNVERIFIED_SEOJK_IDS = [
   "seojk-24-2023", "seojk-29-2022"
 ];
 
-for (const id of UNVERIFIED_SEOJK_IDS) {
+for (const id of SEOJK_SOURCE_REVIEW_IDS) {
   V1_REGULATION_METADATA[id] = {
     verifiedOn: "",
     verifiedAt: "",
     verification: "Belum diverifikasi terhadap naskah resmi OJK",
     aliases: [],
-    changeSummary: "Status, tanggal berlaku, dan hubungan dengan ketentuan lain perlu diverifikasi pada naskah resmi OJK.",
+    changeSummary: "Tanggal berlaku dicocokkan dengan sumber OJK; status hukum dan hubungan dengan ketentuan lain masih memerlukan penelusuran naskah serta ketentuan penerus.",
     deadlines: ["Verifikasi naskah resmi dan lampiran sebelum menggunakan ringkasan ini untuk keputusan."],
-    relatedIds: []
+    relatedIds: [],
+    sourceCheckedOn: "2026-09-28"
   };
 }
+
+Object.assign(V1_REGULATION_METADATA["seojk-12-2022"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Pencabutan dikonfirmasi pada SEOJK 16/SEOJK.03/2024",
+  changeSummary: "Dicabut oleh SEOJK 16/SEOJK.03/2024 sejak 1 Desember 2024. Naskah SEOJK 12/2022 sendiri mulai berlaku 1 Februari 2023, berbeda dari tanggal penetapannya.",
+  relatedIds: ["seojk-16-2024"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-16-SEOJK.03-2024-Pelaporan-Melalui-Sistem-Pelaporan-Otoritas-Jasa-Keuangan-dan-Transparansi-Kondisi-Keuangan-bagi.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-3-2023"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Pencabutan dikonfirmasi pada SEOJK 17/SEOJK.03/2024",
+  changeSummary: "Mulai berlaku 1 Februari 2023 menurut klausul penutup naskah, meski halaman indeks OJK menampilkan 12 Januari 2023. Dicabut oleh SEOJK 17/SEOJK.03/2024 sejak 1 Desember 2024.",
+  relatedIds: [],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/SEOJK-17-SEOJK03-2024-Pelaporan-Melalui-Sistem-Pelaporan-OJK-dan-Transparansi-Kondisi-Keuangan-bagi-BPRS.aspx"
+});
+Object.assign(V1_REGULATION_METADATA["seojk-23-2022"], {
+  verifiedOn: "2026-09-28",
+  verifiedAt: "28 September 2026",
+  verification: "Pencabutan sebagian dikonfirmasi pada SEOJK 29/SEOJK.03/2025",
+  changeSummary: "Romawi IV angka 4 dan Lampiran E dicabut oleh SEOJK 29/SEOJK.03/2025; bagian lain perlu dibaca bersama perubahan berikutnya.",
+  relatedIds: ["seojk-29-2025"],
+  sourceEvidenceUrl: "https://ojk.go.id/id/regulasi/Pages/29-SEOJK03-2025-Transparansi-dan-Publikasi-Laporan-Bank-Umum-Konvensional.aspx"
+});
 
 const REGULATORY_FRESHNESS_POLICY = Object.freeze({
   reviewAfterDays: 45,

@@ -14,7 +14,7 @@ const { regulations, metadata, alerts, checklists, freshnessPolicy } = await loa
 
 const errors = [];
 const warnings = [];
-const allowedStatuses = new Set(["Berlaku", "Akan berlaku", "Sebagian dicabut", "Perlu verifikasi"]);
+const allowedStatuses = new Set(["Berlaku", "Akan berlaku", "Sebagian dicabut", "Dicabut", "Perlu verifikasi"]);
 const allowedFreshnessStates = new Set(["current", "review", "stale", "unknown"]);
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/;
 const sha256Pattern = /^[a-f0-9]{64}$/;
@@ -86,6 +86,12 @@ for (const regulation of regulations) {
   }
 
   const unverified = record.verifiedOn === "" && record.verifiedAt === "";
+  if (record.sourceCheckedOn && !isIsoDate(record.sourceCheckedOn)) {
+    error(scope, "sourceCheckedOn must be a real ISO date.");
+  }
+  if (regulation.type === "SEOJK" && !unverified && !isAllowedAuthorityUrl(record.sourceEvidenceUrl, policy)) {
+    error(scope, "Verified SEOJK status requires an official OJK successor/source evidence URL.");
+  }
   if (unverified) {
     if (record.verification !== "Belum diverifikasi terhadap naskah resmi OJK") {
       error(scope, "Unverified entries must carry the explicit unverified label.");
