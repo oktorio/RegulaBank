@@ -902,3 +902,43 @@ textarea:focus-visible {
 .trust-shortcut span { font-size: 11px; }
 .trust-shortcut small { font-size: 10px; }
 .v1-nav .nav-item { font-size: 10px; }
+
+
+/* V1.3.12 simplified information density */
+.hero {
+  padding: 22px 20px 18px;
+}
+.search-card {
+  margin-top: 0;
+}
+.quick-searches {
+  margin-top: 10px;
+}
+.trust-shortcut {
+  padding-top: 13px;
+  padding-bottom: 11px;
+}
+.trust-shortcut small {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1;
+}
+.kicker:empty {
+  display: none;
+}
+.section-heading h2,
+.page-intro h2 {
+  margin-top: 0;
+}
+.library,
+.saved-view,
+.about-view {
+  padding-top: 22px;
+}
+.workspace-view {
+  padding-top: 22px;
+}
+.page-intro {
+  padding-top: 0;
+  padding-bottom: 14px;
+}
