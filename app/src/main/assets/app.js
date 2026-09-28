@@ -306,19 +306,16 @@
     elements.empty.hidden = regulations.length > 0;
     elements.list.hidden = regulations.length === 0;
 
+    elements.kicker.textContent = "";
     if (state.query) {
-      elements.kicker.textContent = "HASIL PENCARIAN";
-      elements.title.textContent = `“${state.query}”`;
+      elements.title.textContent = `Hasil “${state.query}”`;
     } else if (state.attentionOnly) {
-      elements.kicker.textContent = "PERLU PERHATIAN";
-      elements.title.textContent = "Ketentuan yang perlu ditinjau";
+      elements.title.textContent = "Perlu perhatian";
     } else if (state.statuses.size || state.categories.size || state.integrityStates.size) {
-      elements.kicker.textContent = "HASIL FILTER";
       elements.title.textContent = state.statuses.size === 1 && !state.categories.size && !state.integrityStates.size
-        ? `Status: ${[...state.statuses][0]}` : "Ketentuan sesuai filter";
+        ? `Status: ${[...state.statuses][0]}` : "Hasil filter";
     } else {
-      elements.kicker.textContent = "SEMUA KETENTUAN";
-      elements.title.textContent = "Ketentuan perbankan";
+      elements.title.textContent = "Semua ketentuan";
     }
     bindCardEvents(elements.list);
   }
@@ -724,7 +721,11 @@
   }
 
   function renderRecentSearches() {
-    const recent = readStore("regulabank-recent", []);
+    const quickQueries = new Set(
+      $("#quickSearches [data-query]").map((button) => normalize(button.dataset.query))
+    );
+    const recent = readStore("regulabank-recent", [])
+      .filter((query) => !quickQueries.has(normalize(query)));
     $("#recentSearches").hidden = recent.length === 0 || Boolean(state.query);
     $("#recentSearchPills").innerHTML = recent.map((query) =>
       `<button data-recent="${escapeHtml(query)}">${escapeHtml(query)}</button>`
