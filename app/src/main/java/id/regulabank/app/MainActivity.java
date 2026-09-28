@@ -81,11 +81,15 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
+        if (webView == null) {
             super.onBackPressed();
+            return;
         }
+        webView.evaluateJavascript("window.naradaDismissOverlay ? window.naradaDismissOverlay() : false", result -> {
+            if ("true".equals(result)) return;
+            if (webView.canGoBack()) webView.goBack();
+            else MainActivity.super.onBackPressed();
+        });
     }
 
     @Override

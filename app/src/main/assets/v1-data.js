@@ -217,7 +217,9 @@ REGULATIONS.forEach((regulation) => {
     authority: "Otoritas Jasa Keuangan",
     sourceType: "official-regulation-page",
     sourceUrl: regulation.source,
-    verificationMethod: freshness.verifiedOn ? "human-curated" : "unverified",
+    verificationMethod: freshness.verifiedOn
+      ? (regulation.type === "SEOJK" && regulation.sourceCheckedOn ? "source-reviewed" : "human-curated")
+      : "unverified",
     interpretationLayer: "RegulaBank editorial summary"
   };
 });

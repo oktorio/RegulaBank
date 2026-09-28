@@ -607,7 +607,8 @@ button {
 }
 
 .status-tag.sebagian-dicabut,
-.status-tag.perlu-verifikasi {
+.status-tag.perlu-verifikasi,
+.status-tag.dicabut {
   color: #995d4a;
   background: #fae9e4;
 }
@@ -1111,7 +1112,7 @@ body.sheet-open {
   --green-100:#f8e8e9;--green-50:#fff5f5;--gold:#b98a45;--gold-soft:#f3d8aa;
   --paper:#fffaf7;--line:#ead9d5;--danger:#b21725;
 }
-.topbar{background:linear-gradient(135deg,#6f0d18 0%,#a71928 58%,#7a0f1b 100%);position:relative;overflow:hidden}
+.topbar{background:linear-gradient(135deg,#6f0d18 0%,#a71928 58%,#7a0f1b 100%);position:sticky;top:0;overflow:hidden}
 .topbar::after,.hero::after,.page-intro::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.13;background-image:repeating-radial-gradient(circle at 0 0,transparent 0 8px,rgba(255,255,255,.8) 9px 10px,transparent 11px 18px),repeating-linear-gradient(45deg,transparent 0 16px,rgba(255,255,255,.35) 17px 18px,transparent 19px 32px)}
 .topbar>*{position:relative;z-index:1}.brand-mark{border-color:rgba(255,235,215,.55);background:rgba(255,255,255,.08)}
 .hero{position:relative;overflow:hidden;background:linear-gradient(145deg,#8f1724 0%,#b82131 48%,#7d101c 100%)}

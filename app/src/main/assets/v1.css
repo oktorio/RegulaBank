@@ -27,6 +27,20 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+.card-body:focus-visible {
+  outline: 2px solid var(--green-700);
+  outline-offset: -3px;
+  border-radius: 12px;
+}
+
+.evidence-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--green-700);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -878,3 +892,13 @@ textarea:focus-visible {
 .trust-strip strong,.template-picker select,.saved-summary strong,.text-action,.alert-card button{color:var(--green-700)}
 .checklist-primary input,.switch-row input{accent-color:var(--green-700)}
 .toast{background:rgba(103,12,24,.97)}
+
+/* Keep long legal-status labels readable on narrow screens. */
+.card-footer { flex-wrap: wrap; }
+.card-footer .status-tag { margin-left: 0; }
+.card-summary { font-size: 12px; }
+.category-tag, .status-tag, .integrity-tag { font-size: 10px; }
+.verification-row, .integrity-note { font-size: 10px; line-height: 1.45; }
+.trust-shortcut span { font-size: 11px; }
+.trust-shortcut small { font-size: 10px; }
+.v1-nav .nav-item { font-size: 10px; }

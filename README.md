@@ -1,6 +1,6 @@
-# RegulaBank
+# NARADA
 
-RegulaBank is an Android-first regulatory workspace for searching, reading, bookmarking, and working with Indonesian banking regulations. The app combines a curated local index with official OJK source links and optional offline PDF indexing.
+NARADA is an Android-first regulatory workspace for searching, reading, bookmarking, and working with Indonesian banking regulations. The app combines a curated local index with official OJK source links and optional offline PDF indexing.
 
 > **Important:** RegulaBank is not an official OJK application and is not a substitute for the authoritative regulation text. Always verify status, amendments, effective dates, and obligations against official OJK sources before making a regulatory or supervisory decision.
 
@@ -177,6 +177,6 @@ Bookmarks, notes, checklists, downloaded PDFs, and generated PDF search indexes 
 
 ## Version
 
-Current version: **V1.3 Regulatory Workflows** (`1.3.0`).
+Current version: **V1.3.10 Navigation and SEOJK Review** (`1.3.10`).
 
-V1.3 adds interactive dashboard shortcuts, clearer official-document download affordances, and dedicated regulatory checklists for **Produk Bank Umum** (POJK 13/POJK.03/2021) and **Layanan Digital oleh Bank Umum** (POJK 21 Tahun 2023), including explicit references to the applicable official appendices.
+V1.3.10 records a source-by-source date review for 26 SEOJK and improves Android Back navigation, dashboard filters, detail links, and keyboard access. Legal-status review remains pending where no subsequent OJK instrument has been traced. See [SEOJK review](docs/seojk-source-review-2026-09-28.md).

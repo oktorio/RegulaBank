@@ -130,8 +130,10 @@ for (const regulation of regulations) {
     if (!allowedFreshnessStates.has(integrity.state)) error(scope, `Unsupported freshness state: ${integrity.state}`);
     if (integrity.authority !== policy.authority) error(scope, `Integrity authority must be ${policy.authority}.`);
     if (integrity.sourceUrl !== regulation.source) error(scope, "Integrity sourceUrl must match the regulation source.");
-    if (integrity.verificationMethod !== (unverified ? "unverified" : "human-curated")) {
-      error(scope, "verificationMethod must match the human verification state.");
+    const expectedMethod = unverified ? "unverified"
+      : (regulation.type === "SEOJK" && record.sourceCheckedOn ? "source-reviewed" : "human-curated");
+    if (integrity.verificationMethod !== expectedMethod) {
+      error(scope, "verificationMethod must match the documented source-review state.");
     }
     if (integrity.verifiedOn !== record.verifiedOn) error(scope, "Runtime integrity.verifiedOn must match metadata verifiedOn.");
     if (unverified && (integrity.state !== "unknown" || integrity.ageDays !== null)) {

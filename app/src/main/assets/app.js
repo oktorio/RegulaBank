@@ -21,7 +21,8 @@
     offlineSearchTimer: null,
     noteSaveTimer: null,
     savedAlertsOnly: readStore("regulabank-saved-alerts-only", false),
-    attentionOnly: false
+    attentionOnly: false,
+    shortcutActive: false
   };
 
   const elements = {
@@ -249,7 +250,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10v15l-5-3-5 3z"></path></svg>
           </button>
         </div>
-        <div class="card-body" data-open="${escapeHtml(regulation.id)}">
+        <div class="card-body" data-open="${escapeHtml(regulation.id)}" role="button" tabindex="0" aria-label="Buka ${escapeHtml(regulation.type)} ${escapeHtml(regulation.number)}: ${escapeHtml(regulation.title)}">
           <h3>${highlight(regulation.title)}</h3>
           <p class="card-summary">${highlight(contentSnippet(regulation))}</p>
           <div class="card-footer">
@@ -311,9 +312,10 @@
     } else if (state.attentionOnly) {
       elements.kicker.textContent = "PERLU PERHATIAN";
       elements.title.textContent = "Ketentuan yang perlu ditinjau";
-    } else if (state.statuses.size) {
-      elements.kicker.textContent = "AKAN BERLAKU";
-      elements.title.textContent = "Ketentuan yang akan berlaku";
+    } else if (state.statuses.size || state.categories.size || state.integrityStates.size) {
+      elements.kicker.textContent = "HASIL FILTER";
+      elements.title.textContent = state.statuses.size === 1 && !state.categories.size && !state.integrityStates.size
+        ? `Status: ${[...state.statuses][0]}` : "Ketentuan sesuai filter";
     } else {
       elements.kicker.textContent = "SEMUA KETENTUAN";
       elements.title.textContent = "Ketentuan perbankan";
@@ -335,6 +337,12 @@
   function bindCardEvents(container) {
     container.querySelectorAll("[data-open]").forEach((node) => {
       node.addEventListener("click", () => openDetail(node.dataset.open));
+      node.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openDetail(node.dataset.open);
+        }
+      });
     });
     container.querySelectorAll("[data-bookmark]").forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -406,7 +414,8 @@
   }
 
   function citationFor(regulation) {
-    return `${regulation.type} ${regulation.number}, ${regulation.title}. Sumber resmi OJK: ${regulation.source} (indeks NARADA diperiksa ${regulation.verifiedAt}).`;
+    const checked = regulation.verifiedAt || (regulation.sourceCheckedOn ? formatDate(regulation.sourceCheckedOn) : "");
+    return `${regulation.type} ${regulation.number}, ${regulation.title}. Sumber resmi OJK: ${regulation.source}${checked ? ` (data indeks dicocokkan ${checked})` : ""}.`;
   }
 
   function nativeAvailable(method) {
@@ -438,6 +447,7 @@
   function openDetail(id, addHistory = true) {
     const regulation = REGULATIONS.find((item) => item.id === id);
     if (!regulation) return;
+    if (elements.sheet.hidden) state.detailReturnFocus = document.activeElement;
 
     const downloaded = downloadedPdfCount(regulation.id);
     const favorite = state.favorites.has(regulation.id);
@@ -464,7 +474,7 @@
         <div><span>Efektif</span><strong>${escapeHtml(regulation.effective)}</strong></div>
       </div>
       <div class="verification-card">
-        <div><span>Verifikasi manusia</span><strong>${escapeHtml(regulation.verification)}</strong></div>
+        <div><span>Pemeriksaan sumber</span><strong>${escapeHtml(regulation.verification)}</strong></div>
         <div><span>Terakhir diperiksa</span><strong>${escapeHtml(regulation.verifiedAt || "Belum diverifikasi")}</strong></div>
         ${regulation.sourceCheckedOn ? `<div><span>Data pada sumber OJK dicocokkan</span><strong>${formatDate(regulation.sourceCheckedOn)}</strong></div>` : ""}
         <div><span>Freshness</span><strong class="integrity-text integrity-${escapeHtml(integrityState(regulation))}">${escapeHtml(integrityLabel(regulation))}</strong></div>
@@ -482,6 +492,7 @@
       <section class="detail-section">
         <h3>Apa yang perlu diperhatikan</h3>
         <p class="change-card">${escapeHtml(regulation.changeSummary)}</p>
+        ${regulation.sourceEvidenceUrl ? `<a class="evidence-link" href="${escapeHtml(regulation.sourceEvidenceUrl)}">Buka dasar perubahan status di OJK →</a>` : ""}
       </section>
       <section class="detail-section">
         <h3>Tanggal &amp; tindak lanjut</h3>
@@ -532,8 +543,10 @@
 
     elements.backdrop.hidden = false;
     elements.sheet.hidden = false;
+    elements.sheet.scrollTop = 0;
     elements.sheet.dataset.regulationId = regulation.id;
     document.body.classList.add("sheet-open");
+    $("#detailClose").focus();
 
     $("#detailClose").addEventListener("click", closeDetail);
     $("#detailBookmark").addEventListener("click", () => {
@@ -559,7 +572,7 @@
     }
 
     if (addHistory && (!history.state || history.state.detail !== id)) {
-      history.pushState({ detail: id }, "", `#${id}`);
+      history.pushState({ view: state.view, detail: id, detailDepth: (history.state?.detailDepth || 0) + 1 }, "", `#${id}`);
     }
   }
 
@@ -567,7 +580,8 @@
     elements.backdrop.hidden = true;
     elements.sheet.hidden = true;
     document.body.classList.remove("sheet-open");
-    if (useHistory && history.state && history.state.detail) history.back();
+    if (state.detailReturnFocus?.isConnected) state.detailReturnFocus.focus();
+    if (useHistory && history.state && history.state.detail) history.go(-(history.state.detailDepth || 1));
   }
 
   function saveNote(id, value) {
@@ -755,13 +769,21 @@
 
   function runSearch(query, save = false) {
     state.attentionOnly = false;
+    state.shortcutActive = false;
+    state.categories.clear();
+    state.statuses.clear();
+    state.integrityStates.clear();
+    renderFilters();
     setView("library");
     elements.input.value = query;
     elements.input.dispatchEvent(new Event("input", { bubbles: true }));
     if (save) saveRecentSearch(query);
   }
 
-  function setView(view) {
+  function setView(view, addHistory = true) {
+    if (!["library", "alerts", "checklist", "saved", "about"].includes(view)) return;
+    const changed = state.view !== view;
+    if (addHistory && changed) history.pushState({ view }, "", `#${view}`);
     state.view = view;
     $("#libraryView").hidden = view !== "library";
     $("#alertsView").hidden = view !== "alerts";
@@ -773,7 +795,7 @@
     if (view === "checklist") renderChecklist();
     if (view === "saved") renderSaved();
     if (view === "about") updateStorageStats();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (changed) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function showToast(message) {
@@ -790,6 +812,7 @@
     $("#confirmMessage").textContent = message;
     $("#confirmAction").textContent = actionLabel;
     $("#confirmDialog").hidden = false;
+    $("#confirmCancel").focus();
     $("#confirmAction").onclick = () => {
       $("#confirmDialog").hidden = true;
       callback();
@@ -814,6 +837,14 @@
   let previousQuery = "";
   elements.input.addEventListener("input", () => {
     state.query = elements.input.value.trim();
+    if (state.query && state.shortcutActive) {
+      state.categories.clear();
+      state.statuses.clear();
+      state.integrityStates.clear();
+      state.attentionOnly = false;
+      state.shortcutActive = false;
+      renderFilters();
+    }
     elements.input.parentElement.classList.toggle("has-value", state.query.length > 0);
     if (!previousQuery && state.query) {
       state.sort = "relevance";
@@ -856,6 +887,7 @@
 
   elements.filterButton.addEventListener("click", () => {
     elements.filters.hidden = !elements.filters.hidden;
+    elements.filterButton.setAttribute("aria-expanded", String(!elements.filters.hidden));
   });
 
   elements.resetFilter.addEventListener("click", () => {
@@ -953,6 +985,19 @@
     $("#confirmDialog").hidden = true;
   });
 
+  window.naradaDismissOverlay = () => {
+    if (!$("#confirmDialog").hidden) {
+      $("#confirmDialog").hidden = true;
+      return true;
+    }
+    return false;
+  };
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (window.naradaDismissOverlay()) return;
+    if (!elements.sheet.hidden) closeDetail();
+  });
+
   window.onPdfDownloadUpdate = (id, downloadState, completed, total, message, saved) => {
     if (elements.sheet.dataset.regulationId !== id || elements.sheet.hidden) return;
     const progress = $("#pdfProgress");
@@ -992,13 +1037,16 @@
 
   window.addEventListener("popstate", (event) => {
     if (event.state && event.state.detail) {
+      setView(event.state.view || "library", false);
       openDetail(event.state.detail, false);
-    } else if (!elements.sheet.hidden) {
-      closeDetail(false);
+    } else {
+      if (!elements.sheet.hidden) closeDetail(false);
+      setView(event.state?.view || "library", false);
     }
   });
 
   function applyDashboardShortcut(kind) {
+    state.shortcutActive = true;
     state.query = "";
     elements.input.value = "";
     previousQuery = "";
@@ -1049,4 +1097,5 @@
   renderChecklist();
   renderRecentSearches();
   updateStorageStats();
+  history.replaceState({ view: "library" }, "");
 })();
