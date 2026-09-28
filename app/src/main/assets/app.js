@@ -722,7 +722,8 @@
 
   function renderRecentSearches() {
     const quickQueries = new Set(
-      $("#quickSearches [data-query]").map((button) => normalize(button.dataset.query))
+      Array.from(document.querySelectorAll("#quickSearches [data-query]"))
+        .map((button) => normalize(button.dataset.query))
     );
     const recent = readStore("regulabank-recent", [])
       .filter((query) => !quickQueries.has(normalize(query)));
