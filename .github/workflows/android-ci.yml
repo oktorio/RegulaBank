@@ -24,10 +24,8 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Gradle 8.11.1
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.11.1"
 
       - name: Install Android API 36
         run: |
@@ -49,16 +47,16 @@ jobs:
           node tools/check-release-readiness.mjs --report-only
 
       - name: Unit tests
-        run: gradle --no-daemon --stacktrace :app:testDebugUnitTest
+        run: ./gradlew --no-daemon --stacktrace :app:testDebugUnitTest
 
       - name: Build debug APK
-        run: gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee build.log
+        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee build.log
 
       - name: Lint debug and release
-        run: gradle --no-daemon --stacktrace :app:lintDebug :app:lintRelease
+        run: ./gradlew --no-daemon --stacktrace :app:lintDebug :app:lintRelease
 
       - name: Build unsigned release AAB
-        run: gradle --no-daemon --stacktrace :app:bundleRelease
+        run: ./gradlew --no-daemon --stacktrace :app:bundleRelease
 
       - name: Prepare artifacts
         run: |
