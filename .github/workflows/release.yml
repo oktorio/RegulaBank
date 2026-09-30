@@ -1,0 +1,112 @@
+name: Production Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Install Android API 36
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate release context
+        run: |
+          VERSION_NAME="$(sed -n 's/.*versionName "\([^"]*\)".*/\1/p' app/build.gradle | head -1)"
+          test -n "$VERSION_NAME" || (echo "Cannot resolve versionName" && exit 1)
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "Manual production releases must run from main."
+            exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$VERSION_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match versionName $VERSION_NAME."
+            exit 1
+          fi
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+
+      - name: Production release gate
+        run: |
+          node tools/validate-regulatory-data.mjs
+          node tools/validate-ui-contract.mjs
+          node tools/check-release-readiness.mjs
+
+      - name: Require signing secrets
+        env:
+          KEYSTORE_B64: ${{ secrets.NARADA_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.NARADA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.NARADA_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.NARADA_KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE_B64" || (echo "Missing NARADA_KEYSTORE_B64" && exit 1)
+          test -n "$KEYSTORE_PASSWORD" || (echo "Missing NARADA_KEYSTORE_PASSWORD" && exit 1)
+          test -n "$KEY_ALIAS" || (echo "Missing NARADA_KEY_ALIAS" && exit 1)
+          test -n "$KEY_PASSWORD" || (echo "Missing NARADA_KEY_PASSWORD" && exit 1)
+          echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/narada-upload.jks"
+          echo "NARADA_KEYSTORE_PATH=$RUNNER_TEMP/narada-upload.jks" >> "$GITHUB_ENV"
+          echo "NARADA_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "NARADA_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+          echo "NARADA_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Test, lint, and build signed release
+        run: |
+          gradle --no-daemon --stacktrace :app:testReleaseUnitTest
+          gradle --no-daemon --stacktrace :app:lintRelease
+          gradle --no-daemon --stacktrace :app:bundleRelease :app:assembleRelease
+
+      - name: Verify signed APK
+        run: apksigner verify --verbose app/build/outputs/apk/release/app-release.apk
+
+      - name: Name release files
+        run: |
+          cp app/build/outputs/bundle/release/app-release.aab "NARADA-$VERSION_NAME.aab"
+          cp app/build/outputs/apk/release/app-release.apk "NARADA-$VERSION_NAME.apk"
+
+      - name: Upload signed release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NARADA-${{ env.VERSION_NAME }}-signed
+          path: |
+            NARADA-${{ env.VERSION_NAME }}.aab
+            NARADA-${{ env.VERSION_NAME }}.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish GitHub Release for tag
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "NARADA-${VERSION_NAME}.aab" \
+            "NARADA-${VERSION_NAME}.apk" \
+            --title "NARADA ${GITHUB_REF_NAME}" \
+            --generate-notes

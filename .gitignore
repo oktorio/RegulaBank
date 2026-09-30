@@ -5,3 +5,11 @@ local.properties
 *.iml
 .DS_Store
 Thumbs.db
+*.jks
+*.keystore
+*.p12
+*.pem
+*.aab
+*.apk
+/apk/
+reports/*.json

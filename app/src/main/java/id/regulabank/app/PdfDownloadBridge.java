@@ -42,7 +42,6 @@ public final class PdfDownloadBridge {
     private static final int MAX_PAGE_BYTES = 5 * 1024 * 1024;
     private static final int MAX_PDF_BYTES = 100 * 1024 * 1024;
     private static final int MAX_REDIRECTS = 5;
-    private static final Pattern REGULATION_ID_PATTERN = Pattern.compile("[A-Za-z0-9][A-Za-z0-9_-]{0,79}");
     private static final Pattern PDF_LINK_PATTERN = Pattern.compile(
             "(?i)href\\s*=\\s*([\"'])([^\"']+?\\.pdf(?:\\?[^\"']*)?)\\1"
     );
@@ -257,7 +256,7 @@ public final class PdfDownloadBridge {
             connection.setInstanceFollowRedirects(false);
             connection.setConnectTimeout(20000);
             connection.setReadTimeout(45000);
-            connection.setRequestProperty("User-Agent", "RegulaBank/1.1 (Android; official OJK PDF reader)");
+            connection.setRequestProperty("User-Agent", "NARADA/1.4 (Android; official OJK PDF reader)");
             connection.setRequestProperty("Accept", "application/pdf,text/html;q=0.9,*/*;q=0.8");
 
             int response = connection.getResponseCode();
@@ -279,19 +278,7 @@ public final class PdfDownloadBridge {
     }
 
     private boolean isOfficialOjkUrl(String value) {
-        try {
-            URI uri = new URI(value);
-            String host = uri.getHost();
-            String scheme = uri.getScheme();
-            int port = uri.getPort();
-            if (host == null || !"https".equalsIgnoreCase(scheme)) return false;
-            if (uri.getUserInfo() != null) return false;
-            if (port != -1 && port != 443) return false;
-            String normalizedHost = host.toLowerCase(Locale.ROOT);
-            return normalizedHost.equals("ojk.go.id") || normalizedHost.endsWith(".ojk.go.id");
-        } catch (Exception ignored) {
-            return false;
-        }
+        return SecurityPolicy.isOfficialOjkUrl(value);
     }
 
     private String decodeHtml(String value) {
@@ -323,9 +310,7 @@ public final class PdfDownloadBridge {
     }
 
     private String sanitizeId(String value) {
-        if (value == null) return "";
-        String candidate = value.trim();
-        return REGULATION_ID_PATTERN.matcher(candidate).matches() ? candidate : "";
+        return SecurityPolicy.sanitizeRegulationId(value);
     }
 
     private File pdfDirectory(String regulationId) {

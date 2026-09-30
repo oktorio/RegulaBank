@@ -20,6 +20,7 @@
     offlineMatches: new Map(),
     offlineSearchTimer: null,
     noteSaveTimer: null,
+    confirmReturnFocus: null,
     savedAlertsOnly: readStore("regulabank-saved-alerts-only", false),
     attentionOnly: false,
     shortcutActive: false
@@ -258,10 +259,6 @@
             <span class="status-tag ${statusClass(regulation.status)}">${escapeHtml(regulation.status)}</span>
             <span class="integrity-tag integrity-${escapeHtml(integrityState(regulation))}">${escapeHtml(integrityLabel(regulation))}</span>
           </div>
-          <div class="verification-row">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg>
-            <span>${escapeHtml(regulation.verification)}${regulation.verifiedAt ? ` · dicek ${escapeHtml(regulation.verifiedAt)}` : ""}</span>
-          </div>
         </div>
       </article>`;
   }
@@ -274,12 +271,7 @@
         if (state.categories.size && !state.categories.has(regulation.category)) return false;
         if (state.statuses.size && !state.statuses.has(regulation.status)) return false;
         if (state.integrityStates.size && !state.integrityStates.has(integrityState(regulation))) return false;
-        if (state.attentionOnly) {
-          const needsAttention = normalize(regulation.status).includes("dicabut")
-            || normalize(regulation.status).includes("verifikasi")
-            || ["review", "stale", "unknown"].includes(integrityState(regulation));
-          if (!needsAttention) return false;
-        }
+        if (state.attentionOnly && regulation.status !== "Perlu verifikasi") return false;
         return true;
       });
 
@@ -310,7 +302,7 @@
     if (state.query) {
       elements.title.textContent = `Hasil “${state.query}”`;
     } else if (state.attentionOnly) {
-      elements.title.textContent = "Perlu perhatian";
+      elements.title.textContent = "Perlu verifikasi";
     } else if (state.statuses.size || state.categories.size || state.integrityStates.size) {
       elements.title.textContent = state.statuses.size === 1 && !state.categories.size && !state.integrityStates.size
         ? `Status: ${[...state.statuses][0]}` : "Hasil filter";
@@ -532,7 +524,7 @@
       </section>
       <section class="detail-section">
         <h3>Catatan pribadi</h3>
-        <textarea class="note-box" id="regulationNote" maxlength="3000" placeholder="Tulis interpretasi internal, PIC, atau tindak lanjut…">${escapeHtml(state.notes[regulation.id] || "")}</textarea>
+        <textarea class="note-box" id="regulationNote" maxlength="3000" placeholder="Tulis catatan internal; hindari data rahasia atau sensitif…">${escapeHtml(state.notes[regulation.id] || "")}</textarea>
         <span class="note-status" id="noteStatus">Tersimpan hanya di perangkat</span>
       </section>
       <a class="source-button" href="${escapeHtml(regulation.source)}">Buka sumber resmi OJK</a>
@@ -542,6 +534,7 @@
     elements.sheet.hidden = false;
     elements.sheet.scrollTop = 0;
     elements.sheet.dataset.regulationId = regulation.id;
+    elements.sheet.setAttribute("aria-label", `Detail ${regulation.type} ${regulation.number}`);
     document.body.classList.add("sheet-open");
     $("#detailClose").focus();
 
@@ -782,6 +775,23 @@
     if (save) saveRecentSearch(query);
   }
 
+  function latestCatalogDate() {
+    const dates = REGULATIONS
+      .map((item) => item.integrity?.verifiedOn || item.sourceCheckedOn || "")
+      .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(value))
+      .sort();
+    return dates.length ? dates[dates.length - 1] : "";
+  }
+
+  function updateCatalogStamp() {
+    const latest = latestCatalogDate();
+    const stamp = $("#catalogStamp");
+    const buildLabel = $("#catalogBuildLabel");
+    const label = latest ? `Indeks kurasi: ${formatDate(latest)}` : "Indeks kurasi lokal";
+    if (stamp) stamp.textContent = label;
+    if (buildLabel) buildLabel.textContent = label;
+  }
+
   function setView(view, addHistory = true) {
     if (!["library", "alerts", "checklist", "saved", "about"].includes(view)) return;
     const changed = state.view !== view;
@@ -793,10 +803,16 @@
     $("#savedView").hidden = view !== "saved";
     $("#aboutView").hidden = view !== "about";
     $$(".nav-item").forEach((item) => item.classList.toggle("active", item.dataset.view === view));
-    if (view === "alerts") renderAlerts();
+    if (view === "alerts") {
+      renderAlerts();
+      updateCatalogStamp();
+    }
     if (view === "checklist") renderChecklist();
     if (view === "saved") renderSaved();
-    if (view === "about") updateStorageStats();
+    if (view === "about") {
+      updateStorageStats();
+      updateCatalogStamp();
+    }
     if (changed) window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -809,14 +825,22 @@
     }, 2600);
   }
 
+  function closeConfirmDialog() {
+    const dialog = $("#confirmDialog");
+    dialog.hidden = true;
+    if (state.confirmReturnFocus?.isConnected) state.confirmReturnFocus.focus();
+    state.confirmReturnFocus = null;
+  }
+
   function confirmAction(title, message, actionLabel, callback) {
+    state.confirmReturnFocus = document.activeElement;
     $("#confirmTitle").textContent = title;
     $("#confirmMessage").textContent = message;
     $("#confirmAction").textContent = actionLabel;
     $("#confirmDialog").hidden = false;
     $("#confirmCancel").focus();
     $("#confirmAction").onclick = () => {
-      $("#confirmDialog").hidden = true;
+      closeConfirmDialog();
       callback();
     };
   }
@@ -930,7 +954,6 @@
   $$(".nav-item").forEach((button) => {
     button.addEventListener("click", () => setView(button.dataset.view));
   });
-  $("#aboutButton").addEventListener("click", () => setView("about"));
   elements.backdrop.addEventListener("click", closeDetail);
 
   $("#savedAlertsOnly").addEventListener("change", (event) => {
@@ -983,13 +1006,71 @@
     );
   });
 
-  $("#confirmCancel").addEventListener("click", () => {
-    $("#confirmDialog").hidden = true;
+  $("#clearAllLocalData").addEventListener("click", () => {
+    confirmAction(
+      "Hapus seluruh data lokal?",
+      "Bookmark, catatan, checklist, pencarian terakhir, preferensi, PDF, dan indeks offline akan dihapus dari perangkat ini.",
+      "Hapus semua",
+      () => {
+        try {
+          Object.keys(localStorage)
+            .filter((key) => key.startsWith("regulabank-"))
+            .forEach((key) => localStorage.removeItem(key));
+          if (nativeAvailable("clearOfflineData")) NativeApp.clearOfflineData();
+          location.reload();
+        } catch (_) {
+          showToast("Sebagian data lokal tidak dapat dihapus.");
+        }
+      }
+    );
   });
+
+  $("#confirmCancel").addEventListener("click", closeConfirmDialog);
+
+  function focusableElements(container) {
+    return Array.from(container.querySelectorAll(
+      'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter((node) => !node.hidden);
+  }
+
+  function trapFocus(container, event) {
+    if (event.key !== "Tab") return;
+    const focusable = focusableElements(container);
+    if (!focusable.length) {
+      event.preventDefault();
+      container.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  elements.sheet.addEventListener("keydown", (event) => trapFocus(elements.sheet, event));
+  $("#confirmDialog").addEventListener("keydown", (event) => trapFocus($("#confirmDialog"), event));
 
   window.naradaDismissOverlay = () => {
     if (!$("#confirmDialog").hidden) {
-      $("#confirmDialog").hidden = true;
+      closeConfirmDialog();
+      return true;
+    }
+    return false;
+  };
+
+  window.naradaHandleBack = () => {
+    if (window.naradaDismissOverlay()) return true;
+    if (!elements.sheet.hidden) {
+      closeDetail(true);
+      return true;
+    }
+    if (state.view !== "library") {
+      history.back();
       return true;
     }
     return false;
@@ -1059,10 +1140,10 @@
     state.integrityStates.clear();
     state.attentionOnly = kind === "attention";
     if (kind === "upcoming") {
-      REGULATIONS.filter((item) => normalize(item.status).includes("akan berlaku"))
+      REGULATIONS.filter((item) => item.status === "Akan berlaku")
         .forEach((item) => state.statuses.add(item.status));
     }
-    state.sort = kind === "attention" ? "integrity" : "latest";
+    state.sort = "latest";
     elements.sort.value = state.sort;
     setView("library");
     renderFilters();
@@ -1086,11 +1167,9 @@
 
   $("#indexedCount").textContent = String(REGULATIONS.length);
   $("#upcomingCount").textContent = String(REGULATIONS.filter((item) => item.status === "Akan berlaku").length);
-  $("#attentionCount").textContent = String(REGULATIONS.filter((item) =>
-    normalize(item.status).includes("dicabut") ||
-    normalize(item.status).includes("verifikasi") ||
-    ["review", "stale", "unknown"].includes(integrityState(item))
-  ).length);
+  $("#attentionCount").textContent = String(
+    REGULATIONS.filter((item) => item.status === "Perlu verifikasi").length
+  );
 
   renderFilters();
   renderLibrary();
@@ -1099,5 +1178,6 @@
   renderChecklist();
   renderRecentSearches();
   updateStorageStats();
+  updateCatalogStamp();
   history.replaceState({ view: "library" }, "");
 })();

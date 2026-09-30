@@ -108,13 +108,15 @@ const V1_REGULATION_METADATA = {
     relatedIds: ["pojk-26-2024", "padk-1-2026", "pojk-27-2016"]
   },
   "pojk-27-2016": {
-    verifiedOn: "2026-07-30",
-    verifiedAt: "30 Juli 2026",
-    verification: "Status perlu verifikasi",
+    verifiedOn: "2026-09-30",
+    verifiedAt: "30 September 2026",
+    verification: "Keberlakuan dikonfirmasi pada ketentuan OJK yang lebih baru",
     aliases: ["fit proper test", "fit and proper", "FPT", "penilaian pihak utama"],
-    changeSummary: "Status dan keterkaitan dengan ketentuan penilaian pihak utama terbaru harus diverifikasi pada sumber resmi.",
-    deadlines: ["Jangan gunakan status indeks ini sebagai dasar keputusan tanpa verifikasi OJK"],
-    relatedIds: ["pojk-12-2021", "pojk-7-2024", "pojk-16-2022"]
+    changeSummary: "POJK 2 Tahun 2024 Pasal 52 menyatakan POJK 27/POJK.03/2016 tetap berlaku sepanjang tidak bertentangan dengan POJK tersebut. SEOJK 15/SEOJK.03/2025 juga masih menjadikan POJK 27/2016 sebagai dasar penilaian kemampuan dan kepatutan bagi DPS BPR Syariah.",
+    deadlines: ["Baca bersama ketentuan sektoral dan tata kelola yang lebih baru untuk ruang lingkup pihak utama terkait"],
+    relatedIds: ["pojk-2-2024", "pojk-12-2021", "pojk-7-2024", "pojk-16-2022"],
+    sourceCheckedOn: "2026-09-30",
+    sourceEvidenceUrl: "https://www.ojk.go.id/id/regulasi/Pages/SEOJK-15-SEOJK03-2025-Penerapan-Tata-Kelola-Bagi-Bank-Perekonomian-Rakyat-Syariah.aspx"
   }
 };
 
@@ -405,7 +407,7 @@ REGULATIONS.forEach((regulation) => {
     verificationMethod: freshness.verifiedOn
       ? (regulation.type === "SEOJK" && regulation.sourceCheckedOn ? "source-reviewed" : "human-curated")
       : "unverified",
-    interpretationLayer: "RegulaBank editorial summary"
+    interpretationLayer: "NARADA editorial summary"
   };
 });
 

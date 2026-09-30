@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "applicationId": "id.regulabank.app",
+  "applicationIdConfirmed": false,
+  "privacyPolicyUrl": "https://github.com/oktorio/RegulaBank/blob/main/docs/privacy-policy.md",
+  "productionVersionPattern": "^\\d+\\.\\d+\\.\\d+$",
+  "notes": "Set applicationIdConfirmed=true only after the owner confirms the permanent Google Play application ID."
+}
