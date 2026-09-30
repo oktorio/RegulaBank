@@ -817,7 +817,7 @@ textarea:focus-visible {
   position: fixed;
   z-index: 140;
   right: 18px;
-  bottom: calc(82px + env(safe-area-inset-bottom));
+  bottom: calc(82px + var(--system-inset-bottom, 0px));
   left: 18px;
   max-width: 584px;
   margin: auto;
@@ -941,4 +941,108 @@ textarea:focus-visible {
 .page-intro {
   padding-top: 0;
   padding-bottom: 14px;
+}
+
+
+/* V1.4 release-candidate accessibility and production polish */
+:root {
+  --system-inset-top: 0px;
+  --system-inset-bottom: 0px;
+  --system-inset-left: 0px;
+  --system-inset-right: 0px;
+}
+
+.search-box input {
+  font-size: 16px;
+}
+
+.mode,
+.filter-button,
+.filter-pill,
+.quick-searches button,
+.recent-searches button,
+.secondary-button,
+.danger-button,
+.danger-outline,
+.text-action,
+.appendix-action,
+.alert-card button,
+.detail-actions button,
+.detail-close,
+.bookmark {
+  min-height: 48px;
+}
+
+.bookmark,
+.detail-close {
+  width: 48px;
+  height: 48px;
+}
+
+.bookmark {
+  flex-basis: 48px;
+  margin-top: -7px;
+}
+
+.mode {
+  font-size: 12px;
+}
+
+.quick-searches button,
+.recent-searches button,
+.filter-pill {
+  padding-right: 14px;
+  padding-left: 14px;
+  font-size: 11px;
+}
+
+.detail-actions button {
+  min-height: 48px;
+  font-size: 10px;
+}
+
+.category-tag,
+.status-tag,
+.integrity-tag,
+.verification-card strong,
+.integrity-note,
+.workspace-disclaimer {
+  font-size: 11px;
+}
+
+.verification-card span,
+.detail-meta span,
+.template-picker > span {
+  font-size: 9px;
+}
+
+.v1-nav .nav-item {
+  min-height: 48px;
+  font-size: 11px;
+}
+
+.catalog-stamp {
+  margin: 6px 0 0 !important;
+  color: var(--muted) !important;
+  font-size: 10px !important;
+}
+
+.privacy-link {
+  display: block;
+  margin-top: 12px;
+  padding: 12px 4px;
+  color: var(--green-700);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.privacy-link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.toast {
+  bottom: calc(82px + var(--system-inset-bottom, 0px));
 }
