@@ -525,7 +525,7 @@ const REGULATIONS = [
     type: "POJK",
     title: "Penilaian Kemampuan dan Kepatutan bagi Pihak Utama LJK",
     category: "Perizinan",
-    status: "Perlu verifikasi",
+    status: "Berlaku",
     issued: "2016-07-27",
     effective: "2016",
     topics: ["fit and proper test", "pihak utama", "direksi", "pemegang saham"],
