@@ -776,11 +776,11 @@
   }
 
   function latestCatalogDate() {
-    return REGULATIONS
+    const dates = REGULATIONS
       .map((item) => item.integrity?.verifiedOn || item.sourceCheckedOn || "")
       .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(value))
-      .sort()
-      .at(-1) || "";
+      .sort();
+    return dates.length ? dates[dates.length - 1] : "";
   }
 
   function updateCatalogStamp() {
