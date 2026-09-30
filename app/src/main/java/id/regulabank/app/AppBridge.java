@@ -98,7 +98,7 @@ public final class AppBridge {
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 new BufferedOutputStream(new FileOutputStream(partial)), StandardCharsets.UTF_8))) {
-            writer.write("# RegulaBank offline PDF index\n");
+            writer.write("# NARADA offline PDF index\n");
             for (File pdf : pdfs) {
                 if (characters >= MAX_INDEX_CHARS) break;
                 try (PDDocument document = PDDocument.load(pdf)) {
@@ -242,7 +242,7 @@ public final class AppBridge {
     }
 
     private String safeLabel(String value) {
-        if (value == null || value.trim().isEmpty()) return "RegulaBank";
+        if (value == null || value.trim().isEmpty()) return "NARADA";
         return value.length() > 100 ? value.substring(0, 100) : value;
     }
 
