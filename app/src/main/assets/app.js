@@ -1006,6 +1006,25 @@
     );
   });
 
+  $("#clearAllLocalData").addEventListener("click", () => {
+    confirmAction(
+      "Hapus seluruh data lokal?",
+      "Bookmark, catatan, checklist, pencarian terakhir, preferensi, PDF, dan indeks offline akan dihapus dari perangkat ini.",
+      "Hapus semua",
+      () => {
+        try {
+          Object.keys(localStorage)
+            .filter((key) => key.startsWith("regulabank-"))
+            .forEach((key) => localStorage.removeItem(key));
+          if (nativeAvailable("clearOfflineData")) NativeApp.clearOfflineData();
+          location.reload();
+        } catch (_) {
+          showToast("Sebagian data lokal tidak dapat dihapus.");
+        }
+      }
+    );
+  });
+
   $("#confirmCancel").addEventListener("click", closeConfirmDialog);
 
   function focusableElements(container) {
