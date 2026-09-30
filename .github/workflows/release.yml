@@ -39,6 +39,20 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Validate release context
+        run: |
+          VERSION_NAME="$(sed -n 's/.*versionName "\([^"]*\)".*/\1/p' app/build.gradle | head -1)"
+          test -n "$VERSION_NAME" || (echo "Cannot resolve versionName" && exit 1)
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "Manual production releases must run from main."
+            exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$VERSION_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match versionName $VERSION_NAME."
+            exit 1
+          fi
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+
       - name: Production release gate
         run: |
           node tools/validate-regulatory-data.mjs
@@ -73,10 +87,8 @@ jobs:
 
       - name: Name release files
         run: |
-          VERSION_NAME="$(sed -n 's/.*versionName "\([^"]*\)".*/\1/p' app/build.gradle | head -1)"
           cp app/build/outputs/bundle/release/app-release.aab "NARADA-$VERSION_NAME.aab"
           cp app/build/outputs/apk/release/app-release.apk "NARADA-$VERSION_NAME.apk"
-          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
 
       - name: Upload signed release artifacts
         uses: actions/upload-artifact@v4
@@ -93,4 +105,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}"             "NARADA-${VERSION_NAME}.aab"             "NARADA-${VERSION_NAME}.apk"             --title "NARADA ${GITHUB_REF_NAME}"             --generate-notes
+          gh release create "${GITHUB_REF_NAME}" \
+            "NARADA-${VERSION_NAME}.aab" \
+            "NARADA-${VERSION_NAME}.apk" \
+            --title "NARADA ${GITHUB_REF_NAME}" \
+            --generate-notes
