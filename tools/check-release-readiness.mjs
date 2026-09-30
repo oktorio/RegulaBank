@@ -31,7 +31,9 @@ const versionMatch = appGradle.match(/versionName\s+"([^"]+)"/);
 if (!versionMatch) {
   block("versionName is missing from app/build.gradle.");
 } else if (!new RegExp(releaseConfig.productionVersionPattern).test(versionMatch[1])) {
-  warn(`Current versionName "${versionMatch[1]}" is a release candidate, not a final production version.`);
+  const message = `Current versionName "${versionMatch[1]}" is not a final production version.`;
+  if (reportOnly) warn(message);
+  else block(message);
 }
 
 const unresolved = data.regulations.filter((item) => item.status === "Perlu verifikasi");
@@ -54,6 +56,8 @@ for (const required of [
   "docs/privacy-policy.md",
   "docs/data-safety.md",
   "docs/release-checklist.md",
+  "docs/play-store-listing.md",
+  "docs/content-rating.md",
   "SECURITY.md"
 ]) {
   try {
