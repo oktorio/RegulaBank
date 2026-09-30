@@ -26,7 +26,7 @@ public class SecurityPolicyTest {
 
     @Test
     public void regulationIdRejectsTraversalAndUnsafeCharacters() {
-        assertEquals("pojk-27-2016", SecurityPolicy.sanitizeRegulationId(" po jk ".replace(" ", "")));
+        assertEquals("pojk-27-2016", SecurityPolicy.sanitizeRegulationId("  pojk-27-2016  "));
         assertEquals("", SecurityPolicy.sanitizeRegulationId("../pojk-27-2016"));
         assertEquals("", SecurityPolicy.sanitizeRegulationId("pojk/27/2016"));
         assertEquals("", SecurityPolicy.sanitizeRegulationId(""));
