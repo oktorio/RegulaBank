@@ -1046,3 +1046,10 @@ textarea:focus-visible {
 .toast {
   bottom: calc(82px + var(--system-inset-bottom, 0px));
 }
+
+
+.danger-strong {
+  border-color: #c98b8f;
+  color: #8f1724;
+  background: #fff2f2;
+}
