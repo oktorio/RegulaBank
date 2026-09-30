@@ -33,13 +33,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 public final class AppBridge {
     private static final String INDEX_FILE = ".search-index.txt";
     private static final int MAX_INDEX_CHARS = 6_000_000;
     private static final int MAX_QUERY_LENGTH = 160;
-    private static final Pattern REGULATION_ID_PATTERN = Pattern.compile("[A-Za-z0-9][A-Za-z0-9_-]{0,79}");
 
     private final Activity activity;
     private final File pdfRoot;
@@ -236,9 +234,7 @@ public final class AppBridge {
     }
 
     private String sanitizeId(String value) {
-        if (value == null) return "";
-        String candidate = value.trim();
-        return REGULATION_ID_PATTERN.matcher(candidate).matches() ? candidate : "";
+        return SecurityPolicy.sanitizeRegulationId(value);
     }
 
     private String safeLabel(String value) {
