@@ -257,7 +257,7 @@ public final class PdfDownloadBridge {
             connection.setInstanceFollowRedirects(false);
             connection.setConnectTimeout(20000);
             connection.setReadTimeout(45000);
-            connection.setRequestProperty("User-Agent", "RegulaBank/1.1 (Android; official OJK PDF reader)");
+            connection.setRequestProperty("User-Agent", "NARADA/1.4 (Android; official OJK PDF reader)");
             connection.setRequestProperty("Accept", "application/pdf,text/html;q=0.9,*/*;q=0.8");
 
             int response = connection.getResponseCode();
