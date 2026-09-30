@@ -93,15 +93,15 @@ Use `--report-only` for non-blocking RC diagnostics.
 - JDK 17
 - Android SDK / target API 36
 - Android Gradle Plugin 8.9.1
-- Gradle 8.11.1
+- Gradle Wrapper pinned to 8.11.1
 
 ### Local build
 
 ```bash
-gradle :app:testDebugUnitTest
-gradle :app:assembleDebug
-gradle :app:lintDebug
-gradle :app:bundleRelease
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+./gradlew :app:lintDebug
+./gradlew :app:bundleRelease
 ```
 
 ### Data and UI validation
@@ -158,5 +158,4 @@ See `docs/release-checklist.md` and `docs/data-safety.md`. The release workflow 
 - A fingerprint difference is a review signal, not proof that the legal text changed.
 - Image-only/scanned PDFs require OCR before their content can become searchable.
 - Release shrinking/obfuscation remains disabled pending device-level regression coverage for the PDFBox/WebView bridge.
-- The repository still needs a trusted Gradle Wrapper binary before `./gradlew` can replace the pinned Gradle installation in CI.
 - Source-code licensing for the public repository remains an owner decision; third-party notices are documented in `THIRD_PARTY_NOTICES.md`.
