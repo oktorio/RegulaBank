@@ -71,7 +71,7 @@ jobs:
         run: node tools/check-ojk-regulatory-feed.mjs --output reports/ojk-regulatory-monitor.json --summary "$GITHUB_STEP_SUMMARY"
 
       - name: Upload monitoring evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ojk-regulatory-monitor-${{ github.run_id }}
           path: reports/ojk-regulatory-monitor.json
