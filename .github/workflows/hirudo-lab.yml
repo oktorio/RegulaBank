@@ -33,6 +33,15 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Validate authorized emulator controller
+        run: |
+          bash -n tools/narada-lab-remote.sh
+          bash tools/narada-lab-remote.sh help
+          if NARADA_LAB_EMULATOR_SERIAL=physical-device bash tools/narada-lab-remote.sh open; then
+            echo "Controller failed to reject non-emulator" >&2
+            exit 1
+          fi
+
       - name: Build isolated synthetic lab APK
         run: gradle --no-daemon --stacktrace :app:assembleHirudoLab
 
