@@ -1,0 +1,69 @@
+name: Safe Hirudo Lab APK
+
+on:
+  push:
+    branches:
+      - lab/hirudo-simulation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safe-lab-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Gradle 8.11.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Android API 36
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Validate authorized emulator controller
+        run: |
+          bash -n tools/narada-lab-remote.sh
+          bash tools/narada-lab-remote.sh help
+          if NARADA_LAB_EMULATOR_SERIAL=physical-device bash tools/narada-lab-remote.sh open; then
+            echo "Controller failed to reject non-emulator" >&2
+            exit 1
+          fi
+
+      - name: Build isolated synthetic lab APK
+        run: gradle --no-daemon --stacktrace :app:assembleHirudoLab
+
+      - name: Assert no added malware-sensitive permissions
+        run: |
+          APK="app/build/outputs/apk/hirudoLab/app-hirudoLab.apk"
+          test -f "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump permissions "$APK" | tee lab-permissions.txt
+          if grep -E 'android.permission.(READ_SMS|RECEIVE_SMS|SEND_SMS|READ_CALL_LOG|SYSTEM_ALERT_WINDOW|QUERY_ALL_PACKAGES|REQUEST_INSTALL_PACKAGES|RECEIVE_BOOT_COMPLETED|BIND_ACCESSIBILITY_SERVICE|BIND_NOTIFICATION_LISTENER_SERVICE)' lab-permissions.txt; then
+            echo "Unsafe permission detected in LAB build"
+            exit 1
+          fi
+          cp "$APK" NARADA-hirudo-safe-lab.apk
+          sha256sum NARADA-hirudo-safe-lab.apk | tee NARADA-hirudo-safe-lab.sha256
+
+      - name: Upload safe laboratory APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NARADA-HIRUDO-SAFE-LAB-APK
+          path: |
+            NARADA-hirudo-safe-lab.apk
+            NARADA-hirudo-safe-lab.sha256
+            lab-permissions.txt
+          if-no-files-found: error
+          retention-days: 14
