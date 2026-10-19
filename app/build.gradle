@@ -54,6 +54,14 @@ android {
     }
 
     buildTypes {
+        // Segregated forensic lab build; never included in production release.
+        hirudoLab {
+            initWith debug
+            applicationIdSuffix ".lab"
+            versionNameSuffix "-hirudo-lab"
+            debuggable true
+            matchingFallbacks = ["debug"]
+        }
         debug {
             applicationIdSuffix ""
             versionNameSuffix ""
